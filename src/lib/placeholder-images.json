@@ -1,3 +1,34 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "user-cfo",
+      "description": "CFO User Avatar",
+      "imageUrl": "https://images.unsplash.com/photo-1573165850883-9b0e18c44bd2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwcm9mZXNzaW9uYWwlMjB3b21hbnxlbnwwfHx8fDE3NjMzMjYzNjl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional woman"
+    },
+    {
+      "id": "user-supervisor-1",
+      "description": "Supervisor 1 User Avatar",
+      "imageUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwcm9mZXNzaW9uYWwlMjBtYW58ZW58MHx8fHwxNzYzMjk1Njk3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional man"
+    },
+    {
+      "id": "user-supervisor-2",
+      "description": "Supervisor 2 User Avatar",
+      "imageUrl": "https://images.unsplash.com/photo-1524508762098-fd966ffb6ef9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjB3b3JraW5nfGVufDB8fHx8MTc2MzM2Njg4OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person working"
+    },
+    {
+      "id": "user-gate-team",
+      "description": "Gate Team User Avatar",
+      "imageUrl": "https://images.unsplash.com/photo-1618371731836-2b9bff9ac72a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxzZWN1cml0eSUyMGd1YXJkfGVufDB8fHx8MTc2MzI5MzU3MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "security guard"
+    },
+    {
+      "id": "user-current",
+      "description": "Current User Avatar",
+      "imageUrl": "https://images.unsplash.com/photo-1531123414780-f74242c2b052?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGVyc29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzYzMjU2MDkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    }
+  ]
 }
