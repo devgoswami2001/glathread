@@ -1,3 +1,4 @@
+
 import type { Request, User } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -26,7 +27,9 @@ export function ChatList({ requests, users, selectedRequestId, onSelectRequest }
         <div className="flex flex-col gap-1 p-2">
           {requests.map((request) => {
             const lastMessage = request.messages[request.messages.length - 1];
+            if (!lastMessage) return null; // Defensive check
             const createdByUser = users.find(u => u.id === request.createdBy);
+            
             return (
               <button
                 key={request.id}
@@ -37,8 +40,8 @@ export function ChatList({ requests, users, selectedRequestId, onSelectRequest }
                 onClick={() => onSelectRequest(request.id)}
               >
                 <Avatar className="h-10 w-10 border">
-                    <AvatarImage src={createdByUser?.avatar} alt={createdByUser?.name} />
-                    <AvatarFallback>{createdByUser?.name.charAt(0)}</AvatarFallback>
+                    {createdByUser?.avatar && <AvatarImage src={createdByUser.avatar} alt={createdByUser.name} />}
+                    <AvatarFallback>{createdByUser?.name.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
