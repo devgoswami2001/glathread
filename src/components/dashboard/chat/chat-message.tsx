@@ -43,9 +43,22 @@ function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
         const updateProgress = () => {
             setProgress((audio.currentTime / audio.duration) * 100);
         };
+         const onEnded = () => {
+            setIsPlaying(false);
+            setProgress(0);
+        };
 
         audio.addEventListener('timeupdate', updateProgress);
-        return () => audio.removeEventListener('timeupdate', updateProgress);
+        audio.addEventListener('play', () => setIsPlaying(true));
+        audio.addEventListener('pause', () => setIsPlaying(false));
+        audio.addEventListener('ended', onEnded);
+        
+        return () => {
+            audio.removeEventListener('timeupdate', updateProgress);
+            audio.removeEventListener('play', () => setIsPlaying(true));
+            audio.removeEventListener('pause', () => setIsPlaying(false));
+            audio.removeEventListener('ended', onEnded);
+        };
     }, []);
 
 
@@ -71,9 +84,6 @@ function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
                     <audio 
                         ref={audioRef} 
                         src={file.url}
-                        onPlay={() => setIsPlaying(true)}
-                        onPause={() => setIsPlaying(false)}
-                        onEnded={() => { setIsPlaying(false); setProgress(0); }}
                     />
                     <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 flex-shrink-0" onClick={handlePlayPause}>
                         <Play className={cn("size-5", isPlaying && "hidden")} />

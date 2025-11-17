@@ -4,12 +4,12 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Image, FileText, Mic, Send, Plus, StopCircle, Trash2, Play } from "lucide-react";
+import { Image, FileText, Mic, Send, Plus, StopCircle, Trash2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { Message, MessageType, Request } from "@/lib/types";
-import { requests, users } from "@/lib/data";
+import { requests } from "@/lib/data";
 
 function WaveformAnimation() {
     return (
@@ -38,7 +38,7 @@ export function ChatMessageInput() {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const [audioPreview, setAudioPreview] = useState<string | null>(null);
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +60,7 @@ export function ChatMessageInput() {
   };
 
   const startRecording = async () => {
-    setAudioPreview(null);
+    setAudioPreviewUrl(null);
     setAudioBlob(null);
 
     try {
@@ -79,7 +79,7 @@ export function ChatMessageInput() {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const audioUrl = URL.createObjectURL(audioBlob);
         setAudioBlob(audioBlob);
-        setAudioPreview(audioUrl);
+        setAudioPreviewUrl(audioUrl);
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -111,13 +111,23 @@ export function ChatMessageInput() {
     }
   };
 
-  const handleSendMessage = () => {
+  const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  const handleSendMessage = async () => {
      // This is a placeholder for sending a message.
      // In a real app, you would get the current request from context or props.
     const currentRequest: Request | undefined = requests[0];
     if (!currentRequest) return;
 
-    if (audioPreview && audioBlob) {
+    if (audioPreviewUrl && audioBlob) {
+        const audioDataUrl = await blobToBase64(audioBlob);
         const newMessage: Message = {
             id: `msg-${currentRequest.id}-${currentRequest.messages.length + 1}`,
             requestId: currentRequest.id,
@@ -128,13 +138,13 @@ export function ChatMessageInput() {
             seen: false,
             file: {
                 name: `voice-message-${Date.now()}.webm`,
-                url: audioPreview,
+                url: audioDataUrl,
                 type: 'voice',
                 size: `${(audioBlob.size / 1024).toFixed(2)} KB`
             }
         };
         currentRequest.messages.push(newMessage);
-        setAudioPreview(null);
+        setAudioPreviewUrl(null);
         setAudioBlob(null);
         toast({ title: "Voice message sent!" });
     } else if (message.trim()) {
@@ -153,20 +163,21 @@ export function ChatMessageInput() {
   };
 
   const cancelRecording = () => {
-      setAudioPreview(null);
+      setAudioPreviewUrl(null);
       setAudioBlob(null);
   }
   
   useEffect(() => {
+    const currentAudioUrl = audioPreviewUrl;
     return () => {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
         mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       }
-      if(audioPreview){
-        URL.revokeObjectURL(audioPreview);
+      if(currentAudioUrl){
+        URL.revokeObjectURL(currentAudioUrl);
       }
     };
-  }, [audioPreview]);
+  }, [audioPreviewUrl]);
 
   return (
     <div className="border-t bg-card p-4">
@@ -219,7 +230,7 @@ export function ChatMessageInput() {
                 >
                     <WaveformAnimation />
                 </motion.div>
-            ) : audioPreview ? (
+            ) : audioPreviewUrl ? (
                  <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -228,7 +239,7 @@ export function ChatMessageInput() {
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={cancelRecording}>
                         <Trash2 className="text-destructive h-5 w-5"/>
                     </Button>
-                    <audio src={audioPreview} controls className="w-full h-8"/>
+                    <audio src={audioPreviewUrl} controls className="w-full h-8"/>
                  </motion.div>
             ) : (
                 <Input
@@ -242,7 +253,7 @@ export function ChatMessageInput() {
             </div>
         </AnimatePresence>
 
-        {(message || audioPreview) && !isRecording ? (
+        {(message || audioPreviewUrl) && !isRecording ? (
           <Button size="icon" className="h-9 w-9 flex-shrink-0 rounded-full bg-primary text-primary-foreground" onClick={handleSendMessage}>
             <Send className="h-5 w-5" />
             <span className="sr-only">Send</span>
