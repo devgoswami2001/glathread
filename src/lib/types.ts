@@ -50,12 +50,18 @@ export enum RequestType {
   LOCAL_TRIP = 'Local Trip',
   OUTSTATION_TRIP = 'Outstation Trip',
   MATERIAL_DISPATCH = 'Material Dispatch',
+  BILL = 'Bill',
+  MONTHLY_BUS_BILL = 'Monthly Bus Bill',
 }
 
 export enum VehicleType {
     CAR = 'Car',
     TRUCK = 'Truck',
     BIKE = 'Bike',
+    BUS = 'Bus',
+    GOLF_CART = 'Golf Cart',
+    E_RICKSHAW = 'E-Rickshaw',
+    E_LOADER = 'E-Loader',
 }
 
 export type Request = {
