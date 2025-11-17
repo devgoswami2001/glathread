@@ -1,9 +1,11 @@
+'use client';
+
 import type { Message, Request, User } from "@/lib/types";
 import { MessageType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon, Paperclip, Truck, Car, Bike, Bus, StopCircle } from "lucide-react";
+import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon, Paperclip, Truck, Car, Bike, Bus, StopCircle, FileType2, Sheet } from "lucide-react";
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -13,12 +15,28 @@ import Image from "next/image";
 import { requests } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
 import { useRef, useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { RequestStatus } from "@/lib/types";
 
 
 interface ChatMessageProps {
   message: Message;
   sender: User;
   isCurrentUser: boolean;
+}
+
+function getStatusClass(status: RequestStatus) {
+    switch (status) {
+        case RequestStatus.PENDING: return "bg-amber-100 text-amber-700 border-amber-200";
+        case RequestStatus.APPROVED: return "bg-blue-100 text-blue-700 border-blue-200";
+        case RequestStatus.WORKING: return "bg-teal-100 text-teal-700 border-teal-200";
+        case RequestStatus.WORK_COMPLETED: return "bg-sky-100 text-sky-700 border-sky-200";
+        case RequestStatus.PAYMENT_PENDING: return "bg-orange-100 text-orange-700 border-orange-200";
+        case RequestStatus.PAYMENT_DONE: return "bg-green-100 text-green-700 border-green-200";
+        case RequestStatus.REJECTED: return "bg-red-100 text-red-700 border-red-200";
+        case RequestStatus.OVERDUE: return "bg-rose-100 text-rose-700 border-rose-200";
+        default: return "bg-gray-100 text-gray-700 border-gray-200";
+    }
 }
 
 function FileMessageContent({ file, isCurrentUser }: { file: NonNullable<Message['file']>, isCurrentUser: boolean }) {
@@ -101,22 +119,22 @@ function FileMessageContent({ file, isCurrentUser }: { file: NonNullable<Message
                 );
             default:
                 const getFileIcon = () => {
-                    if (file.name.endsWith('.pdf')) return <FileText className="h-8 w-8 text-red-500" />;
-                    if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) return <FileText className="h-8 w-8 text-blue-500" />;
-                    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) return <FileText className="h-8 w-8 text-green-500" />;
-                    return <FileIcon className="h-8 w-8 text-muted-foreground" />;
+                    if (file.name.endsWith('.pdf')) return <FileText className="h-6 w-6 text-red-600" />;
+                    if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) return <FileText className="h-6 w-6 text-blue-600" />;
+                    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) return <FileText className="h-6 w-6 text-green-600" />;
+                    return <FileIcon className="h-6 w-6 text-muted-foreground" />;
                 }
                 return (
                      <div className={cn(
-                        "flex items-center gap-3 rounded-lg border p-3 w-80 max-w-full",
-                         isCurrentUser ? "bg-primary/80 border-primary-foreground/20" : "bg-card border-border"
+                        "flex items-center gap-3 rounded-lg border bg-secondary/30 p-3 w-80 max-w-full hover:bg-secondary/60 transition-colors group",
+                         isCurrentUser ? "bg-primary/10 border-primary/20" : "bg-card border-border"
                     )}>
                         <div className="flex-shrink-0">{getFileIcon()}</div>
                         <div className="flex-1 min-w-0">
                             <p className="truncate font-medium text-sm">{file.name}</p>
-                            <p className="text-xs text-foreground/80">{file.size || 'N/A'}</p>
+                            <p className="text-xs text-muted-foreground">{file.size || 'N/A'}</p>
                         </div>
-                        <Button size="icon" variant="ghost" className="flex-shrink-0 h-9 w-9" asChild>
+                        <Button size="icon" variant="ghost" className="flex-shrink-0 h-9 w-9 opacity-50 group-hover:opacity-100" asChild>
                             <a href={file.url} download>
                                 <Download className="size-5" />
                             </a>
@@ -129,7 +147,7 @@ function FileMessageContent({ file, isCurrentUser }: { file: NonNullable<Message
     return (
         <div className={cn(
             "p-1.5 rounded-lg",
-            isCurrentUser ? 'bg-primary' : 'bg-card'
+            ['image', 'video'].includes(file.type) && (isCurrentUser ? 'bg-primary' : 'bg-card shadow-sm')
         )}>
             {renderContent()}
         </div>
@@ -139,55 +157,64 @@ function FileMessageContent({ file, isCurrentUser }: { file: NonNullable<Message
 function RequestDetailsMessage({ request }: { request: Request }) {
     const getVehicleIcon = (vehicleType: string) => {
         switch(vehicleType) {
-            case 'Car': return <Car className="h-6 w-6 text-primary" />;
-            case 'Truck': return <Truck className="h-6 w-6 text-primary" />;
-            case 'Bike': return <Bike className="h-6 w-6 text-primary" />;
-            case 'Bus': return <Bus className="h-6 w-6 text-primary" />;
-            default: return <Car className="h-6 w-6 text-primary" />;
+            case 'Car': return <Car className="h-5 w-5 text-primary" />;
+            case 'Truck': return <Truck className="h-5 w-5 text-primary" />;
+            case 'Bike': return <Bike className="h-5 w-5 text-primary" />;
+            case 'Bus': return <Bus className="h-5 w-5 text-primary" />;
+            default: return <Car className="h-5 w-5 text-primary" />;
         }
     }
 
+    const getFileIcon = (fileName: string) => {
+        if (fileName.endsWith('.pdf')) return <FileText className="h-5 w-5 text-red-500 flex-shrink-0" />;
+        if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) return <FileText className="h-5 w-5 text-blue-500 flex-shrink-0" />;
+        if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) return <Sheet className="h-5 w-5 text-green-500 flex-shrink-0" />;
+        return <FileType2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />;
+    }
+
     return (
-        <Card className="bg-secondary/50 border-dashed">
-            <CardHeader>
-                <div className="flex items-start gap-4">
-                    <div className="bg-primary/10 p-3 rounded-full">
-                        {getVehicleIcon(request.vehicleType)}
-                    </div>
-                    <div>
-                        <CardTitle className="text-base font-semibold leading-tight">{request.title}</CardTitle>
-                        <CardDescription className="text-sm mt-1">{request.vehicleDetails}</CardDescription>
-                    </div>
-                </div>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-2">
-                <Separator/>
-                <div className="space-y-1">
-                    <p className="font-medium text-sm">Description</p>
-                    <p className="text-muted-foreground text-sm">{request.messages.find(m => m.type === MessageType.TEXT)?.content || "No description provided."}</p>
-                </div>
-                {request.documents.length > 0 && (
-                    <div>
-                        <p className="font-medium text-sm mb-2">Documents</p>
-                        <div className="space-y-2">
-                            {request.documents.map((doc, index) => (
-                                <div key={index} className="flex items-center justify-between rounded-md border bg-background/50 p-2 text-sm">
-                                    <div className="flex items-center gap-2 truncate">
-                                        <Paperclip className="h-4 w-4 text-muted-foreground" />
-                                        <span className="truncate">{doc.name}</span>
-                                    </div>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                                        <a href={doc.url} download>
-                                            <Download className="h-4 w-4"/>
-                                        </a>
-                                    </Button>
-                                </div>
-                            ))}
+        <div className="w-full max-w-2xl mx-auto my-4">
+            <div className="bg-card rounded-xl border border-gray-200/80 shadow-sm">
+                <div className="p-4 md:p-6">
+                    <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                            <h2 className="text-xl font-semibold tracking-tight">{request.title}</h2>
+                            <p className="text-sm text-gray-500">{request.vehicleDetails}</p>
                         </div>
+                         <Badge className={`px-3 py-1 text-xs rounded-full font-medium border ${getStatusClass(request.status)}`}>
+                            {request.status.toUpperCase()}
+                        </Badge>
                     </div>
-                )}
-            </CardContent>
-        </Card>
+
+                    <Separator className="my-4" />
+                    
+                    <div className="space-y-4">
+                        <div>
+                             <h3 className="text-sm font-medium text-gray-600 mb-2">Description</h3>
+                             <p className="text-sm leading-relaxed text-gray-800">{request.messages.find(m => m.type === MessageType.TEXT)?.content || "No description provided."}</p>
+                        </div>
+                        {request.documents.length > 0 && (
+                             <div>
+                                <h3 className="text-sm font-medium text-gray-600 mb-2">Documents</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {request.documents.map((doc, index) => (
+                                        <a href={doc.url} key={index} download className="group">
+                                            <div className="flex items-center gap-3 rounded-lg border bg-gray-50/80 p-2.5 hover:bg-gray-100 hover:shadow-sm transition-all duration-200">
+                                                {getFileIcon(doc.name)}
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="font-medium text-sm truncate">{doc.name}</p>
+                                                </div>
+                                                <Download className="h-5 w-5 text-gray-400 group-hover:text-primary transition-colors" />
+                                            </div>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
     )
 }
 
@@ -199,14 +226,14 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
     switch (message.type) {
       case MessageType.APPROVAL:
         return (
-          <Card className="bg-secondary">
+          <Card className="bg-secondary/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-semibold">Approval Required</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">{message.content}</p>
               <div className="flex gap-2">
-                <Button size="sm" variant="outline"><ThumbsUp className="mr-2 h-4 w-4" /> Approve</Button>
+                <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white"><ThumbsUp className="mr-2 h-4 w-4" /> Approve</Button>
                 <Button size="sm" variant="destructive"><ThumbsDown className="mr-2 h-4 w-4" /> Reject</Button>
               </div>
             </CardContent>
@@ -214,7 +241,7 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
         );
       case MessageType.DATE_PROMPT:
          return (
-          <Card className="bg-secondary">
+          <Card className="bg-secondary/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-semibold">Set Dates</CardTitle>
             </CardHeader>
@@ -236,7 +263,7 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
         );
       case MessageType.OUTPASS_GENERATION:
         return (
-             <Card className="bg-secondary">
+             <Card className="bg-secondary/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-semibold">Out-Pass Ready</CardTitle>
                 </CardHeader>
@@ -252,7 +279,7 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
         )
        case MessageType.PAYMENT_TRACKING:
          return (
-             <Card className="bg-secondary">
+             <Card className="bg-secondary/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-semibold">Action Required: Payment</CardTitle>
                 </CardHeader>
@@ -273,7 +300,7 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
         return (
             <div
                 className={cn(
-                "rounded-lg px-3 py-2",
+                "rounded-lg px-3 py-2 shadow-sm",
                 isCurrentUser
                     ? "bg-primary text-primary-foreground"
                     : "bg-card"

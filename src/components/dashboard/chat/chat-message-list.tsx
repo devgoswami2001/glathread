@@ -28,9 +28,9 @@ export function ChatMessageList({ request, users, currentUser }: ChatMessageList
   }, [request.messages]);
   
   return (
-    <ScrollArea className="flex-1 bg-muted/20" ref={scrollAreaRef}>
+    <ScrollArea className="flex-1" ref={scrollAreaRef}>
       <div className="p-4 md:p-6">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 max-w-2xl mx-auto">
           {request.messages.map((message) => {
              const sender = message.senderId === 'system' 
               ? { id: 'system', name: 'System', avatar: '/logo.svg', role: 'CFO' as const } 

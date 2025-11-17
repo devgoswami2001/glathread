@@ -180,17 +180,17 @@ export function ChatMessageInput() {
   }, [audioPreviewUrl]);
 
   return (
-    <div className="border-t bg-card p-4">
+    <div className="sticky bottom-0 bg-background/95 backdrop-blur-sm p-2 md:p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.05)]">
       <input
         type="file"
         ref={fileInputRef}
         onChange={handleFileSelect}
         className="hidden"
       />
-      <div className="relative flex items-center gap-2">
+      <div className="relative flex items-center gap-2 max-w-2xl mx-auto">
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9 flex-shrink-0">
+            <Button variant="ghost" size="icon" className="h-9 w-9 flex-shrink-0 text-muted-foreground hover:text-primary">
               <Plus className="h-5 w-5" />
               <span className="sr-only">Attach file</span>
             </Button>
@@ -260,7 +260,7 @@ export function ChatMessageInput() {
           </Button>
         ) : (
           <Button size="icon" className="h-9 w-9 flex-shrink-0" variant="ghost" onClick={handleVoiceClick}>
-            {isRecording ? <StopCircle className="h-5 w-5 text-destructive animate-pulse" /> : <Mic className="h-5 w-5" />}
+            {isRecording ? <StopCircle className="h-5 w-5 text-destructive animate-pulse" /> : <Mic className="h-5 w-5 text-muted-foreground hover:text-primary" />}
             <span className="sr-only">{isRecording ? "Stop recording" : "Record voice message"}</span>
           </Button>
         )}

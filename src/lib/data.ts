@@ -160,7 +160,7 @@ export const requests: Request[] = [
   },
   {
     id: 'TR-008',
-    title: 'Urgent: deliver documents to HQ',
+    title: 'Urgent Material Dispatch to Site A',
     vehicleType: VehicleType.BIKE,
     vehicleNumber: 'MH03-LM5678',
     vehicleDetails: 'Bajaj Pulsar - MH03-LM5678',
@@ -169,10 +169,25 @@ export const requests: Request[] = [
     createdBy: 'user-supervisor-1',
     cfo: 'user-cfo',
     createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
     documents: [],
     messages: [
-        { id: 'msg-8-1', requestId: '8', senderId: 'system', content: 'This request is overdue. Please take action.', timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.SYSTEM, seen: false },
+        { id: 'msg-8-1', requestId: '8', senderId: 'user-supervisor-1', content: 'Need this approved ASAP to avoid delays.', timestamp: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: true },
+        { 
+            id: 'msg-8-2', 
+            requestId: '8', 
+            senderId: 'user-cfo', 
+            content: '', 
+            timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), 
+            type: MessageType.FILE,
+            seen: true,
+            file: {
+                name: 'urgent-dispatch-approval.wav',
+                url: 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+                type: 'voice',
+                size: '0.12 KB'
+            }
+        },
     ]
   },
   {
