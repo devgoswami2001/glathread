@@ -3,7 +3,6 @@
 import type { Request, User } from '@/lib/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
-import { ChatList } from './chat-list';
 import { ChatDisplay } from './chat-display';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -35,42 +34,13 @@ export function ChatLayout({ requests, users, defaultSelectedRequestId }: ChatLa
 
   return (
     <div className="relative flex h-[calc(100vh-12rem)] w-full rounded-lg border bg-card">
-      <div className={cn("h-full w-full md:w-1/3 md:border-r", isMobile && selectedRequestId ? 'hidden' : 'block')}>
-        <ChatList
-          requests={requests}
-          users={users}
-          selectedRequestId={selectedRequestId}
-          onSelectRequest={handleSelectRequest}
+      <div className="h-full flex-1">
+        <ChatDisplay 
+          request={selectedRequest || null} 
+          users={users} 
+          currentUser={currentUser!}
         />
       </div>
-
-      <AnimatePresence>
-        {selectedRequest && isMobile ? (
-          <motion.div
-            key="chat-display"
-            className="absolute inset-0 z-10 bg-card"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          >
-            <ChatDisplay 
-              request={selectedRequest} 
-              users={users} 
-              currentUser={currentUser!}
-              onBack={handleBack}
-            />
-          </motion.div>
-        ) : (
-          <div className={cn("h-full flex-1", isMobile ? 'hidden' : 'flex')}>
-            <ChatDisplay 
-              request={selectedRequest || null} 
-              users={users} 
-              currentUser={currentUser!}
-            />
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
