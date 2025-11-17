@@ -12,7 +12,7 @@ interface ChatTopbarProps {
 export function ChatTopbar({ request, onBack }: ChatTopbarProps) {
   return (
     <div className="flex h-16 items-center gap-3 border-b px-4">
-       <Button variant="ghost" size="icon" onClick={onBack} className={onBack ? "md:hidden" : "hidden"}>
+       <Button variant="ghost" size="icon" onClick={onBack} className={onBack ? "flex md:hidden" : "hidden"}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <Button variant="ghost" size="icon" className="hidden md:flex" asChild>

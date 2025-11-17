@@ -50,7 +50,7 @@ export function ChatList({ requests, users, selectedRequestId, onSelectRequest }
                       {formatDistanceToNow(new Date(lastMessage.timestamp), { addSuffix: true })}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground truncate">{lastMessage.content}</p>
+                  <p className="text-sm text-muted-foreground truncate">{lastMessage.content || lastMessage.type.replace('_', ' ')}</p>
                 </div>
               </button>
             );
