@@ -18,7 +18,7 @@ export function ChatDisplay({ request, users, currentUser, onBack }: ChatDisplay
         <div className="rounded-full bg-primary/10 p-4 text-primary">
             <MoveRight className="h-10 w-10"/>
         </div>
-        <h3 className="font-headline text-2xl font-semibold">Welcome to SwiftFlow</h3>
+        <h3 className="font-headline text-2xl font-semibold">Welcome to GLAThread</h3>
         <p className="text-muted-foreground">Select a request from the sidebar to start the conversation.</p>
       </div>
     );

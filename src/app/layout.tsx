@@ -9,7 +9,7 @@ const fontHeadline = Space_Grotesk({ subsets: ['latin'], variable: '--font-headl
 
 
 export const metadata: Metadata = {
-  title: 'TransitPro',
+  title: 'GLAThread',
   description: 'Streamlined transport and logistics management.',
 };
 

@@ -34,7 +34,7 @@ export function LoginForm() {
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required defaultValue="supervisor@transitpro.app" />
+            <Input id="email" type="email" placeholder="m@example.com" required defaultValue="supervisor@glathread.app" />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
