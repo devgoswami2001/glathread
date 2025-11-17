@@ -56,7 +56,7 @@ export function SearchFilterBar({ onFilterChange }: SearchFilterBarProps) {
   );
 
   return (
-    <div className="p-4 bg-card rounded-lg border shadow-sm">
+    <div className="p-4 bg-card rounded-lg border-2 shadow-md">
       {/* Desktop View */}
       <div className="hidden md:block">
         <div className="flex justify-between items-center">

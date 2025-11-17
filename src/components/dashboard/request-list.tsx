@@ -14,22 +14,22 @@ interface RequestListProps {
 
 const getStatusClass = (status: RequestStatus) => {
   switch (status) {
-    case RequestStatus.PENDING: return "bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700";
-    case RequestStatus.APPROVED: return "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700";
-    case RequestStatus.WORKING: return "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-700";
-    case RequestStatus.WORK_COMPLETED: return "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700";
-    case RequestStatus.PAYMENT_PENDING: return "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/50 dark:text-orange-300 dark:border-orange-700";
-    case RequestStatus.PAYMENT_DONE: return "bg-teal-100 text-teal-800 border-teal-300 dark:bg-teal-900/50 dark:text-teal-300 dark:border-teal-700";
-    case RequestStatus.REJECTED: return "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700";
-    case RequestStatus.OVERDUE: return "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-700";
-    default: return "bg-secondary";
+    case RequestStatus.PENDING: return "bg-yellow-400 text-yellow-900 border-yellow-500";
+    case RequestStatus.APPROVED: return "bg-blue-400 text-blue-900 border-blue-500";
+    case RequestStatus.WORKING: return "bg-indigo-400 text-indigo-900 border-indigo-500";
+    case RequestStatus.WORK_COMPLETED: return "bg-green-400 text-green-900 border-green-500";
+    case RequestStatus.PAYMENT_PENDING: return "bg-orange-400 text-orange-900 border-orange-500";
+    case RequestStatus.PAYMENT_DONE: return "bg-emerald-400 text-emerald-900 border-emerald-500";
+    case RequestStatus.REJECTED: return "bg-red-500 text-white border-red-600";
+    case RequestStatus.OVERDUE: return "bg-rose-500 text-white border-rose-600";
+    default: return "bg-gray-400 text-gray-900 border-gray-500";
   }
 };
 
 
 export function RequestList({ requests }: RequestListProps) {
   return (
-    <div className="bg-card p-4 sm:p-6 rounded-lg border">
+    <div className="bg-card p-4 sm:p-6 rounded-lg border-2">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
             <h2 className="text-xl font-semibold tracking-tight">Request Threads</h2>
             <div className="flex items-center gap-2">
@@ -50,13 +50,13 @@ export function RequestList({ requests }: RequestListProps) {
         </div>
       <div className="grid gap-4">
         {requests.map((request) => (
-          <Card key={request.id} className="shadow-sm hover:shadow-md transition-all duration-300">
+          <Card key={request.id} className="shadow-md hover:shadow-lg transition-all duration-300 border-2 border-border/60">
              <Link href={`/dashboard/requests/${request.id.replace('TR-','')}`} className="block hover:bg-secondary/50 rounded-lg">
                 <CardContent className="p-4 grid md:grid-cols-12 items-center gap-4">
                     <div className="md:col-span-8 flex flex-col gap-2">
                         <div className="flex items-center gap-3">
-                            <span className="font-mono text-sm text-muted-foreground">{request.id}</span>
-                            <Badge variant="outline" className="text-xs">{request.requestType}</Badge>
+                            <span className="font-mono text-sm text-muted-foreground bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">{request.id}</span>
+                            <Badge variant="outline" className="text-xs border-dashed">{request.requestType}</Badge>
                         </div>
                         <h3 className="font-semibold text-lg leading-tight">{request.title}</h3>
                         <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
@@ -66,10 +66,10 @@ export function RequestList({ requests }: RequestListProps) {
                         </div>
                     </div>
                     <div className="md:col-span-3 flex md:flex-col md:items-end gap-2">
-                        <Badge className={`py-1 px-3 text-xs font-medium rounded-md border ${getStatusClass(request.status)}`}>{request.status}</Badge>
+                        <Badge className={`py-1.5 px-3 text-xs font-bold rounded-md border-2 ${getStatusClass(request.status)}`}>{request.status.toUpperCase()}</Badge>
                     </div>
                     <div className="md:col-span-1 flex justify-end">
-                        <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground">
+                        <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-primary/10 hover:text-primary rounded-full">
                             <ArrowRight className="h-5 w-5" />
                         </Button>
                     </div>

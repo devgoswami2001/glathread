@@ -57,7 +57,7 @@ export function Dashboard() {
           <h1 className="font-headline text-3xl font-bold tracking-tight">Transport Dashboard</h1>
           <p className="text-muted-foreground">Manage and track all transport requests.</p>
         </div>
-        <Button size="lg" className="hidden md:flex" asChild>
+        <Button size="lg" className="hidden md:flex shadow-md hover:shadow-lg transition-shadow" asChild>
           <Link href="/dashboard/requests/new">
             <PlusCircle className="mr-2 h-5 w-5" />
             Create New Transport Request
