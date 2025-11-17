@@ -18,27 +18,27 @@ export function DashboardHeader() {
   const userInitials = currentUser?.name.split(' ').map(n => n[0]).join('') || 'U';
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b-4 border-black/10 bg-background/80 backdrop-blur-sm px-4 md:px-6">
        <div className="flex items-center gap-4">
         <Link href="/dashboard" className="hidden md:block">
             <Logo className="h-8 w-auto" />
         </Link>
        </div>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="h-9 w-9">
+        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-sm">
             <Bell className="h-5 w-5"/>
             <span className="sr-only">Notifications</span>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Avatar className="h-10 w-10 border-2 border-transparent group-hover:border-primary transition-colors">
+              <Avatar className="h-10 w-10 border-2 border-black/20">
                 <AvatarImage src={currentUser?.avatar} alt={currentUser?.name} />
                 <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-60" align="end" forceMount>
+          <DropdownMenuContent className="w-60 rounded-sm border-2 border-black/20" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">{currentUser?.name}</p>
@@ -48,20 +48,20 @@ export function DashboardHeader() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem className="rounded-sm">
                 <UserIcon className="mr-2 h-4 w-4" />
                 <span>My Profile</span>
             </DropdownMenuItem>
-             <DropdownMenuItem>
+             <DropdownMenuItem className="rounded-sm">
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Change Password</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem className="rounded-sm">
                 <Moon className="mr-2 h-4 w-4" />
                 <span>Dark Mode</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="rounded-sm">
               <Link href="/">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
