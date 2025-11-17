@@ -16,35 +16,41 @@ export const users: User[] = [
 export const requests: Request[] = [
   {
     id: 'TR-001',
-    title: 'Urgent Material Dispatch to Site A',
-    vehicleType: VehicleType.TRUCK,
-    vehicleNumber: 'MH12-AB1234',
-    vehicleDetails: 'TATA ACE - MH12-AB1234',
-    requestType: RequestType.MATERIAL_DISPATCH,
+    title: 'Monthly Bus Bill - January 2025',
+    vehicleType: VehicleType.BUS,
+    vehicleNumber: 'UP85 XX 4521',
+    vehicleDetails: 'Bus - UP85 XX 4521',
+    requestType: RequestType.MONTHLY_BUS_BILL,
     status: RequestStatus.PENDING,
     createdBy: 'user-supervisor-1',
     cfo: 'user-cfo',
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    documents: [{ name: 'invoice_123.pdf', url: '#' }],
+    documents: [
+        { name: 'jan-bus-invoice.pdf', url: '#' },
+        { name: 'fuel-report-jan.xlsx', url: '#' },
+        { name: 'logsheet-jan.pdf', url: '#' },
+        { name: 'route-utilization-jan.pdf', url: '#' }
+    ],
     messages: [
-      { id: 'msg-1-1', requestId: '1', senderId: 'system', content: 'Request created by Phoenix Baker. Awaiting CFO approval.', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), type: MessageType.SYSTEM, seen: true },
-      { id: 'msg-1-2', requestId: '1', senderId: 'user-supervisor-1', content: 'Need this approved ASAP to avoid delays.', timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: false },
+      { 
+        id: 'msg-1-0', 
+        requestId: 'TR-001', 
+        senderId: 'system', 
+        type: MessageType.REQUEST_DETAILS, 
+        content: 'Request created by Phoenix Baker.', 
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), 
+        seen: true 
+      },
+      { id: 'msg-1-1', requestId: 'TR-001', senderId: 'user-supervisor-1', content: 'Monthly bus bill for January 2025 with all supporting documents attached.', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: true },
       { 
         id: 'msg-1-3', 
-        requestId: '1', 
+        requestId: 'TR-001', 
         senderId: 'user-cfo', 
-        content: '', 
+        content: 'Please review the attached documents for the monthly bus bill and approve or reject the request.', 
         timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), 
-        type: MessageType.FILE, 
+        type: MessageType.APPROVAL, 
         seen: false,
-        file: {
-            name: 'cfo-voice-memo.webm',
-            // A silent 1-second webm file as a base64 data URL
-            url: 'data:audio/webm;base64,GkXfo6NChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAAkEnppYgAAAAAAMZXERA4AAAAAABobm+gMo4/3d/n7+P/8AgUAMZXERA4AAAAAABobm+gMo4/3d/n7+P/8AgUAAAAAAABhTrr4AAAAAABT/LgAAAAAAABf/73/8//8AAAAAAAAB8v//+P///////////////////////////////////////////////+AAAAA=',
-            type: 'voice',
-            size: '2 KB'
-        }
       }
     ]
   },
