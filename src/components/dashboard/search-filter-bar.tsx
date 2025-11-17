@@ -1,5 +1,4 @@
 
-
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -13,9 +12,9 @@ interface SearchFilterBarProps {
 }
 
 export function SearchFilterBar({ onFilterChange }: SearchFilterBarProps) {
-  const renderFilters = (isMobile = false) => (
-    <div className={isMobile ? "grid grid-cols-1 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:flex xl:flex-row gap-2"}>
-      <Input placeholder="Request ID (TR-xxxx)" className="xl:w-40"/>
+  const filterElements = (
+    <>
+      <Input placeholder="Request ID (TR-xxxx)" className="xl:w-40" />
       <Input placeholder="Vehicle Number" className="xl:w-40" />
       <Select>
         <SelectTrigger className="xl:w-40">
@@ -37,10 +36,10 @@ export function SearchFilterBar({ onFilterChange }: SearchFilterBarProps) {
           ))}
         </SelectContent>
       </Select>
-       <Select>
+      <Select>
         <SelectTrigger className="xl:w-48">
           <SelectValue placeholder="Status" />
-        </Trigger>
+        </SelectTrigger>
         <SelectContent>
           {Object.values(RequestStatus).map(status => (
             <SelectItem key={status} value={status}>{status}</SelectItem>
@@ -53,7 +52,7 @@ export function SearchFilterBar({ onFilterChange }: SearchFilterBarProps) {
         <Button className="w-full md:w-auto"><Search className="mr-2 h-4 w-4" /> Search</Button>
         <Button variant="ghost" className="w-full md:w-auto"><X className="mr-2 h-4 w-4" /> Clear</Button>
       </div>
-    </div>
+    </>
   );
 
   return (
@@ -61,9 +60,11 @@ export function SearchFilterBar({ onFilterChange }: SearchFilterBarProps) {
       {/* Desktop View */}
       <div className="hidden md:block">
         <div className="flex justify-between items-center">
-            <div className="flex-grow">
-                {renderFilters()}
+          <div className="flex-grow">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:flex xl:flex-row gap-2">
+              {filterElements}
             </div>
+          </div>
         </div>
       </div>
 
@@ -84,9 +85,9 @@ export function SearchFilterBar({ onFilterChange }: SearchFilterBarProps) {
               </SheetDescription>
             </SheetHeader>
             <div className="flex-1 overflow-y-auto pr-6 -mr-6">
-                <div className="flex flex-col gap-4">
-                    {renderFilters(true)}
-                </div>
+              <div className="grid grid-cols-1 gap-4">
+                {filterElements}
+              </div>
             </div>
           </SheetContent>
         </Sheet>
