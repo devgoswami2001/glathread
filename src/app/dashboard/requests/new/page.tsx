@@ -1,11 +1,12 @@
 
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { RequestType } from "@/lib/types";
+import { RequestType, VehicleType } from "@/lib/types";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -26,37 +27,90 @@ export default function NewRequestPage() {
                 <CardDescription>Fill out the form below to submit a new transport request.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="vehicle-type">Vehicle Type</Label>
+                        <Select>
+                            <SelectTrigger id="vehicle-type">
+                                <SelectValue placeholder="Select vehicle type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Object.values(VehicleType).map((type) => (
+                                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="request-type">Request Type</Label>
+                        <Select>
+                            <SelectTrigger id="request-type">
+                                <SelectValue placeholder="Select a request type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Object.values(RequestType).map((type) => (
+                                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
                 <div className="space-y-2">
-                    <Label htmlFor="title">Request Title</Label>
-                    <Input id="title" placeholder="e.g., Urgent Material Dispatch to Site A" />
+                    <Label htmlFor="vehicle-number">Vehicle Number</Label>
+                    <Input id="vehicle-number" placeholder="e.g., MH12-AB1234" />
                 </div>
+                
                 <div className="space-y-2">
-                    <Label htmlFor="vehicle-details">Vehicle Details</Label>
-                    <Input id="vehicle-details" placeholder="e.g., TATA ACE - MH12-AB1234" />
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea id="description" placeholder="Add a detailed description of the request..." />
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="request-type">Request Type</Label>
-                    <Select>
-                        <SelectTrigger id="request-type">
-                            <SelectValue placeholder="Select a request type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {Object.values(RequestType).map((type) => (
-                                <SelectItem key={type} value={type}>{type}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+
+                <div className="space-y-4">
+                    <Label>Documents</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg">
+                        <div className="space-y-2">
+                            <Label htmlFor="doc-a-name" className="text-sm font-normal">Document A Name</Label>
+                            <Input id="doc-a-name" placeholder="e.g., Invoice" />
+                        </div>
+                        <div className="space-y-2">
+                             <Label htmlFor="doc-a-file" className="text-sm font-normal">Document A File</Label>
+                            <Input id="doc-a-file" type="file" />
+                        </div>
+                    </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg">
+                        <div className="space-y-2">
+                            <Label htmlFor="doc-b-name" className="text-sm font-normal">Document B Name</Label>
+                            <Input id="doc-b-name" placeholder="e.g., Challan" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="doc-b-file" className="text-sm font-normal">Document B File</Label>
+                            <Input id="doc-b-file" type="file" />
+                        </div>
+                    </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg">
+                        <div className="space-y-2">
+                            <Label htmlFor="doc-c-name" className="text-sm font-normal">Document C Name</Label>
+                            <Input id="doc-c-name" placeholder="e.g., Quotation" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="doc-c-file" className="text-sm font-normal">Document C File</Label>
+                            <Input id="doc-c-file" type="file" />
+                        </div>
+                    </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg">
+                        <div className="space-y-2">
+                            <Label htmlFor="doc-d-name" className="text-sm font-normal">Document D Name</Label>
+                            <Input id="doc-d-name" placeholder="e.g., Permit" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="doc-d-file" className="text-sm font-normal">Document D File</Label>
+                            <Input id="doc-d-file" type="file" />
+                        </div>
+                    </div>
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="documents">Upload Documents</Label>
-                    <Input id="documents" type="file" />
-                    <p className="text-xs text-muted-foreground">Attach relevant documents like invoices, challans, etc.</p>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="message">Initial Message</Label>
-                    <Textarea id="message" placeholder="Add any additional details or instructions for the approver." />
-                </div>
-                <Button type="submit">Submit Request</Button>
+
+                <Button type="submit" size="lg">Submit Request</Button>
             </CardContent>
         </Card>
        </div>
