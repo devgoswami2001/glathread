@@ -8,6 +8,7 @@ import { RequestList } from "./request-list";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { PlusCircle } from "lucide-react";
+import Link from "next/link";
 
 export function Dashboard() {
   const [filteredRequests, setFilteredRequests] = useState<Request[]>(requests);
@@ -53,12 +54,14 @@ export function Dashboard() {
     <>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-headline text-3xl font-semibold">Transport Dashboard</h1>
+          <h1 className="font-headline text-3xl font-bold tracking-tight">Transport Dashboard</h1>
           <p className="text-muted-foreground">Manage and track all transport requests.</p>
         </div>
-        <Button size="lg" className="hidden md:flex">
-          <PlusCircle className="mr-2 h-5 w-5" />
-          Create New Transport Request
+        <Button size="lg" className="hidden md:flex" asChild>
+          <Link href="/dashboard/requests/new">
+            <PlusCircle className="mr-2 h-5 w-5" />
+            Create New Transport Request
+          </Link>
         </Button>
       </div>
 
@@ -67,9 +70,11 @@ export function Dashboard() {
       <RequestList requests={filteredRequests} />
 
       {/* Floating Action Button for Mobile */}
-      <Button className="md:hidden fixed bottom-4 right-4 rounded-full w-14 h-14 shadow-lg z-20">
-        <PlusCircle className="h-6 w-6" />
-        <span className="sr-only">Create New Request</span>
+      <Button asChild className="md:hidden fixed bottom-6 right-6 rounded-full w-16 h-16 shadow-lg z-20">
+         <Link href="/dashboard/requests/new">
+            <PlusCircle className="h-7 w-7" />
+            <span className="sr-only">Create New Request</span>
+         </Link>
       </Button>
     </>
   );

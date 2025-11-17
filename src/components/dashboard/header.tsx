@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogOut, Bell, Settings, User as UserIcon } from "lucide-react";
+import { LogOut, Bell, Settings, User as UserIcon, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -11,17 +11,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { users } from "@/lib/data";
+import { Logo } from "../logo";
 
 export function DashboardHeader() {
   const currentUser = users.find(u => u.id === 'user-current');
   const userInitials = currentUser?.name.split(' ').map(n => n[0]).join('') || 'U';
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
        <div className="flex items-center gap-4">
-        <h1 className="hidden md:block font-headline text-xl font-semibold">Transport Workflow System</h1>
+        <Link href="/dashboard" className="hidden md:block">
+            <Logo className="h-8 w-auto" />
+        </Link>
        </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" className="h-9 w-9">
             <Bell className="h-5 w-5"/>
             <span className="sr-only">Notifications</span>
@@ -29,13 +32,13 @@ export function DashboardHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Avatar className="h-10 w-10 border">
+              <Avatar className="h-10 w-10 border-2 border-transparent group-hover:border-primary transition-colors">
                 <AvatarImage src={currentUser?.avatar} alt={currentUser?.name} />
                 <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuContent className="w-60" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">{currentUser?.name}</p>
@@ -52,6 +55,10 @@ export function DashboardHeader() {
              <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Change Password</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+                <Moon className="mr-2 h-4 w-4" />
+                <span>Dark Mode</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

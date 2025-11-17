@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, Clock, FileCheck, FileX, HandCoins, PiggyBank, ThumbsUp, Truck } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface QuickStatsProps {
   stats: {
@@ -29,10 +30,10 @@ export function QuickStats({ stats }: QuickStatsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
       {statItems.map((item, index) => (
-        <Card key={index} className="shadow-sm hover:shadow-md transition-shadow">
+        <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow duration-300 border-l-4" style={{borderLeftColor: item.color.startsWith('text-') ? `hsl(var(--${item.color.substring(5)}))` : item.color }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
-            <item.icon className={`h-4 w-4 ${item.color}`} />
+            <CardTitle className="text-sm font-medium text-muted-foreground">{item.title}</CardTitle>
+            <item.icon className={cn("h-5 w-5", item.color)} />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{item.value}</div>
