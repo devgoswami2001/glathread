@@ -7,7 +7,7 @@ export function Logo({ className, ...props }: LucideProps) {
       <div className="rounded-lg bg-primary p-2 text-primary-foreground">
         <MoveRight className="h-5 w-5" />
       </div>
-      <span className="font-headline text-2xl font-bold tracking-tight">SwiftFlow</span>
+      <span className="font-headline text-2xl font-bold tracking-tight">TransitPro</span>
     </div>
   );
 }
