@@ -14,6 +14,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { requests } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
+import { useRef, useState } from "react";
 
 
 interface ChatMessageProps {
@@ -23,6 +24,20 @@ interface ChatMessageProps {
 }
 
 function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    const handlePlayPause = () => {
+        if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+            } else {
+                audioRef.current.play();
+            }
+        }
+    };
+
+
     switch (file.type) {
         case 'image':
             return (
@@ -41,15 +56,23 @@ function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
             );
         case 'voice':
             return (
-                <div className="flex items-center gap-3">
-                    <Button size="icon" variant="secondary" className="rounded-full">
-                        <Play className="size-5" />
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-secondary/50 w-64">
+                    <audio 
+                        ref={audioRef} 
+                        src={file.url}
+                        onPlay={() => setIsPlaying(true)}
+                        onPause={() => setIsPlaying(false)}
+                        onEnded={() => setIsPlaying(false)}
+                    />
+                    <Button size="icon" variant="secondary" className="rounded-full h-10 w-10" onClick={handlePlayPause}>
+                        <Play className={cn("size-5", isPlaying && "hidden")} />
+                        <StopCircle className={cn("size-5", !isPlaying && "hidden")} />
                     </Button>
                     <div className="flex-1 space-y-1">
-                        <div className="h-1 w-full rounded-full bg-muted-foreground/30">
-                            <div className="h-1 w-1/3 rounded-full bg-primary"></div>
+                        <div className="h-1.5 w-full rounded-full bg-muted-foreground/30">
+                            <div className="h-full w-1/3 rounded-full bg-primary"></div>
                         </div>
-                        <span className="text-xs text-muted-foreground">0:12 / 0:45</span>
+                        <span className="text-xs text-muted-foreground">{file.size}</span>
                     </div>
                 </div>
             );
@@ -200,7 +223,15 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
             </Card>
          )
         case MessageType.FILE:
-            return message.file ? <FileMessageContent file={message.file} /> : null;
+            if (!message.file) return null;
+            if (isCurrentUser) {
+                return <FileMessageContent file={message.file} />;
+            }
+            return (
+                 <div className={cn("rounded-lg px-3 py-2 bg-card")}>
+                    <FileMessageContent file={message.file} />
+                </div>
+            )
         case MessageType.REQUEST_DETAILS:
              return request ? <RequestDetailsMessage request={request} /> : null;
       case MessageType.TEXT:
@@ -248,3 +279,4 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
     </div>
   );
 }
+

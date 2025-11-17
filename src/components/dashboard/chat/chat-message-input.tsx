@@ -4,9 +4,32 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Image, FileText, Mic, Send, Plus, StopCircle } from "lucide-react";
+import { Image, FileText, Mic, Send, Plus, StopCircle, Trash2, Play } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { AnimatePresence, motion } from "framer-motion";
+import { Message, MessageType, Request } from "@/lib/types";
+import { requests, users } from "@/lib/data";
+
+function WaveformAnimation() {
+    return (
+        <div className="flex w-full items-center justify-center gap-0.5">
+            {Array.from({ length: 20 }).map((_, i) => (
+                <motion.div
+                    key={i}
+                    className="w-1 bg-primary/80"
+                    animate={{ height: [2, 16, 5, 12, 4, 18, 2].map(h => h + Math.random() * 8) }}
+                    transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        repeatType: "loop",
+                        delay: i * 0.05,
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
 
 export function ChatMessageInput() {
   const [message, setMessage] = useState('');
@@ -15,6 +38,8 @@ export function ChatMessageInput() {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const [audioPreview, setAudioPreview] = useState<string | null>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -35,9 +60,12 @@ export function ChatMessageInput() {
   };
 
   const startRecording = async () => {
+    setAudioPreview(null);
+    setAudioBlob(null);
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -50,15 +78,8 @@ export function ChatMessageInput() {
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const audioUrl = URL.createObjectURL(audioBlob);
-        // Here you would typically send the audio file as a message
-        // For now, we'll just log it and show a toast.
-        console.log("Recorded Audio URL:", audioUrl);
-        toast({
-          title: "Recording Complete",
-          description: "Your voice message is ready to be sent.",
-        });
-        
-        // Clean up the stream tracks
+        setAudioBlob(audioBlob);
+        setAudioPreview(audioUrl);
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -89,15 +110,63 @@ export function ChatMessageInput() {
       startRecording();
     }
   };
+
+  const handleSendMessage = () => {
+     // This is a placeholder for sending a message.
+     // In a real app, you would get the current request from context or props.
+    const currentRequest: Request | undefined = requests[0];
+    if (!currentRequest) return;
+
+    if (audioPreview && audioBlob) {
+        const newMessage: Message = {
+            id: `msg-${currentRequest.id}-${currentRequest.messages.length + 1}`,
+            requestId: currentRequest.id,
+            senderId: 'user-current',
+            content: '',
+            timestamp: new Date().toISOString(),
+            type: MessageType.FILE,
+            seen: false,
+            file: {
+                name: `voice-message-${Date.now()}.webm`,
+                url: audioPreview,
+                type: 'voice',
+                size: `${(audioBlob.size / 1024).toFixed(2)} KB`
+            }
+        };
+        currentRequest.messages.push(newMessage);
+        setAudioPreview(null);
+        setAudioBlob(null);
+        toast({ title: "Voice message sent!" });
+    } else if (message.trim()) {
+         const newMessage: Message = {
+            id: `msg-${currentRequest.id}-${currentRequest.messages.length + 1}`,
+            requestId: currentRequest.id,
+            senderId: 'user-current',
+            content: message,
+            timestamp: new Date().toISOString(),
+            type: MessageType.TEXT,
+            seen: false,
+        };
+        currentRequest.messages.push(newMessage);
+        setMessage('');
+    }
+  };
+
+  const cancelRecording = () => {
+      setAudioPreview(null);
+      setAudioBlob(null);
+  }
   
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
         mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       }
+      if(audioPreview){
+        URL.revokeObjectURL(audioPreview);
+      }
     };
-  }, []);
+  }, [audioPreview]);
 
   return (
     <div className="border-t bg-card p-4">
@@ -135,29 +204,46 @@ export function ChatMessageInput() {
                 <FileText className="h-5 w-5" />
                 <span className="text-xs">Doc</span>
               </Button>
-               <Button 
-                variant="outline" 
-                size="icon" 
-                className="h-12 w-12 flex-col gap-1"
-                onClick={handleVoiceClick}
-               >
-                <Mic className="h-5 w-5" />
-                <span className="text-xs">Voice</span>
-              </Button>
             </div>
           </PopoverContent>
         </Popover>
 
-        <Input
-          placeholder={isRecording ? "Recording in progress..." : "Type a message..."}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          disabled={isRecording}
-          className="flex-1 rounded-full bg-secondary px-4 py-2 border-none focus-visible:ring-1 focus-visible:ring-primary h-10"
-        />
+        <AnimatePresence>
+            <div className="flex-1 h-10 flex items-center">
+            {isRecording ? (
+                <motion.div 
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: '100%', opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    className="w-full"
+                >
+                    <WaveformAnimation />
+                </motion.div>
+            ) : audioPreview ? (
+                 <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex w-full items-center gap-2 bg-secondary rounded-full px-3"
+                >
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={cancelRecording}>
+                        <Trash2 className="text-destructive h-5 w-5"/>
+                    </Button>
+                    <audio src={audioPreview} controls className="w-full h-8"/>
+                 </motion.div>
+            ) : (
+                <Input
+                    placeholder="Type a message..."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                    className="flex-1 rounded-full bg-secondary px-4 py-2 border-none focus-visible:ring-1 focus-visible:ring-primary h-10"
+                />
+            )}
+            </div>
+        </AnimatePresence>
 
-        {message && !isRecording ? (
-          <Button size="icon" className="h-9 w-9 flex-shrink-0 rounded-full bg-primary text-primary-foreground">
+        {(message || audioPreview) && !isRecording ? (
+          <Button size="icon" className="h-9 w-9 flex-shrink-0 rounded-full bg-primary text-primary-foreground" onClick={handleSendMessage}>
             <Send className="h-5 w-5" />
             <span className="sr-only">Send</span>
           </Button>
