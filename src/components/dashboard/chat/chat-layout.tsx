@@ -34,7 +34,7 @@ export function ChatLayout({ requests, users, defaultSelectedRequestId }: ChatLa
   }
 
   return (
-    <div className="relative flex h-full w-full">
+    <div className="relative flex h-[calc(100vh-12rem)] w-full rounded-lg border bg-card">
       <div className={cn("h-full w-full md:w-1/3 md:border-r", isMobile && selectedRequestId ? 'hidden' : 'block')}>
         <ChatList
           requests={requests}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusCircle, LogOut } from "lucide-react";
+import { LogOut, Bell, Settings, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Logo } from "@/components/logo";
 import { users } from "@/lib/data";
 
 export function DashboardHeader() {
@@ -18,21 +17,19 @@ export function DashboardHeader() {
   const userInitials = currentUser?.name.split(' ').map(n => n[0]).join('') || 'U';
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-4 md:px-6 shrink-0">
-      <Link href="/dashboard" className="hidden md:block">
-        <Logo className="h-8 w-auto" />
-      </Link>
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6">
+       <div className="flex items-center gap-4">
+        <h1 className="hidden md:block font-headline text-xl font-semibold">Transport Workflow System</h1>
+       </div>
       <div className="flex items-center gap-4">
-        <Button asChild>
-          <Link href="/dashboard/requests/new">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            New Request
-          </Link>
+        <Button variant="ghost" size="icon" className="h-9 w-9">
+            <Bell className="h-5 w-5"/>
+            <span className="sr-only">Notifications</span>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Avatar className="h-10 w-10">
+              <Avatar className="h-10 w-10 border">
                 <AvatarImage src={currentUser?.avatar} alt={currentUser?.name} />
                 <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
@@ -47,6 +44,15 @@ export function DashboardHeader() {
                 </p>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+                <UserIcon className="mr-2 h-4 w-4" />
+                <span>My Profile</span>
+            </DropdownMenuItem>
+             <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Change Password</span>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/">

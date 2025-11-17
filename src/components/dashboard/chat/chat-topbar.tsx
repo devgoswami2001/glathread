@@ -1,8 +1,8 @@
 import type { Request } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ArrowLeft, Home } from "lucide-react";
+import Link from "next/link";
 
 interface ChatTopbarProps {
   request: Request;
@@ -10,27 +10,20 @@ interface ChatTopbarProps {
 }
 
 export function ChatTopbar({ request, onBack }: ChatTopbarProps) {
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'Pending Approval': return 'default';
-      case 'Approved': return 'secondary';
-      case 'Rejected': return 'destructive';
-      case 'In Progress': return 'outline';
-      default: return 'default';
-    }
-  };
-
   return (
     <div className="flex h-16 items-center gap-3 border-b px-4">
-      {onBack && (
-        <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
+       <Button variant="ghost" size="icon" onClick={onBack} className={onBack ? "md:hidden" : "hidden"}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-      )}
+        <Button variant="ghost" size="icon" className="hidden md:flex" asChild>
+          <Link href="/dashboard">
+            <Home className="h-5 w-5" />
+          </Link>
+        </Button>
       <div className="flex-1">
-        <p className="font-semibold truncate">{request.title}</p>
+        <p className="font-semibold truncate">{request.title} <span className="font-mono text-muted-foreground text-sm">({request.id})</span></p>
         <div className="flex items-center gap-2">
-            <Badge variant={getStatusVariant(request.status)} className="capitalize">{request.status}</Badge>
+            <Badge variant={"secondary"} className="capitalize">{request.status}</Badge>
             <span className="text-xs text-muted-foreground">{request.vehicleDetails}</span>
         </div>
       </div>

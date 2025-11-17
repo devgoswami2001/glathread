@@ -32,13 +32,14 @@ export type Message = {
 };
 
 export enum RequestStatus {
-  PENDING = 'Pending Approval',
+  PENDING = 'Pending',
   APPROVED = 'Approved',
+  WORKING = 'Working',
+  WORK_COMPLETED = 'Work Completed',
+  PAYMENT_PENDING = 'Payment Pending',
+  PAYMENT_DONE = 'Payment Done',
   REJECTED = 'Rejected',
-  IN_PROGRESS = 'In Progress',
-  COMPLETED = 'Completed',
-  PAYMENT_DUE = 'Payment Due',
-  PAID = 'Paid',
+  OVERDUE = 'Overdue',
 }
 
 export enum RequestType {
@@ -47,9 +48,17 @@ export enum RequestType {
   MATERIAL_DISPATCH = 'Material Dispatch',
 }
 
+export enum VehicleType {
+    CAR = 'Car',
+    TRUCK = 'Truck',
+    BIKE = 'Bike',
+}
+
 export type Request = {
   id: string;
   title: string;
+  vehicleType: VehicleType;
+  vehicleNumber: string;
   vehicleDetails: string;
   requestType: RequestType;
   status: RequestStatus;
