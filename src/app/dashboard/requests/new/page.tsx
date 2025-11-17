@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -40,9 +41,9 @@ export default function NewRequestPage() {
                             <SelectValue placeholder="Select a request type" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value={RequestType.LOCAL_TRIP}>{RequestType.LOCAL_TRIP}</SelectItem>
-                            <SelectItem value={RequestType.OUTSTATION_TRIP}>{RequestType.OUTSTATION_TRIP}</SelectItem>
-                            <SelectItem value={RequestType.MATERIAL_DISPATCH}>{RequestType.MATERIAL_DISPATCH}</SelectItem>
+                            {Object.values(RequestType).map((type) => (
+                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>

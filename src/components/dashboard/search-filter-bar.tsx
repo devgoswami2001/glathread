@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ export function SearchFilterBar({ onFilterChange }: SearchFilterBarProps) {
         </SelectContent>
       </Select>
       <Select>
-        <SelectTrigger className="xl:w-40">
+        <SelectTrigger className="xl:w-48">
           <SelectValue placeholder="Request Type" />
         </SelectTrigger>
         <SelectContent>
@@ -36,7 +37,7 @@ export function SearchFilterBar({ onFilterChange }: SearchFilterBarProps) {
         </SelectContent>
       </Select>
        <Select>
-        <SelectTrigger className="xl:w-40">
+        <SelectTrigger className="xl:w-48">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>

@@ -1,3 +1,4 @@
+
 export type User = {
   id: string;
   name: string;
@@ -43,6 +44,9 @@ export enum RequestStatus {
 }
 
 export enum RequestType {
+  MAINTENANCE = 'Maintenance',
+  SERVICE = 'Service',
+  VEHICLE_RELATED_SERVICE = 'Vehicle Related Service',
   LOCAL_TRIP = 'Local Trip',
   OUTSTATION_TRIP = 'Outstation Trip',
   MATERIAL_DISPATCH = 'Material Dispatch',
