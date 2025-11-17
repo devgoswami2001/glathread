@@ -80,7 +80,7 @@ function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
             );
         case 'voice':
             return (
-                <div className="flex items-center gap-2 p-2 rounded-lg bg-secondary/50 w-64">
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-background/30 w-64">
                     <audio 
                         ref={audioRef} 
                         src={file.url}
@@ -99,7 +99,7 @@ function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
             );
         default:
             return (
-                <div className="flex items-center gap-3 rounded-lg border bg-secondary p-3">
+                <div className="flex items-center gap-3 rounded-lg border bg-background/50 p-3">
                     <FileIcon className="size-8 shrink-0 text-muted-foreground" />
                     <div className="flex-1">
                         <p className="truncate font-medium">{file.name}</p>
@@ -245,11 +245,8 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
          )
         case MessageType.FILE:
             if (!message.file) return null;
-            if (isCurrentUser) {
-                return <FileMessageContent file={message.file} />;
-            }
-            return (
-                 <div className={cn("rounded-lg px-3 py-2 bg-card")}>
+             return (
+                 <div className={cn("rounded-lg p-2", isCurrentUser ? "bg-primary" : "bg-card")}>
                     <FileMessageContent file={message.file} />
                 </div>
             )
