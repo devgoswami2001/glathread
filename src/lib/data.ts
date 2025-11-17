@@ -24,8 +24,8 @@ export const requests: Request[] = [
     status: RequestStatus.PENDING,
     createdBy: 'user-supervisor-1',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-29T10:30:00.000Z",
+    updatedAt: "2024-07-29T10:30:00.000Z",
     documents: [
         { name: 'jan-bus-invoice.pdf', url: '#' },
         { name: 'fuel-report-jan.xlsx', url: '#' },
@@ -39,16 +39,16 @@ export const requests: Request[] = [
         senderId: 'system', 
         type: MessageType.REQUEST_DETAILS, 
         content: 'Request created by Phoenix Baker.', 
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), 
+        timestamp: "2024-07-29T10:30:00.000Z", 
         seen: true 
       },
-      { id: 'msg-1-1', requestId: 'TR-001', senderId: 'user-supervisor-1', content: 'Monthly bus bill for January 2025 with all supporting documents attached.', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: true },
+      { id: 'msg-1-1', requestId: 'TR-001', senderId: 'user-supervisor-1', content: 'Monthly bus bill for January 2025 with all supporting documents attached.', timestamp: "2024-07-29T10:30:05.000Z", type: MessageType.TEXT, seen: true },
       { 
         id: 'msg-1-3', 
         requestId: 'TR-001', 
         senderId: 'user-cfo', 
         content: 'Please review the attached documents for the monthly bus bill and approve or reject the request.', 
-        timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), 
+        timestamp: "2024-07-29T12:00:00.000Z", 
         type: MessageType.APPROVAL, 
         seen: false,
       }
@@ -64,13 +64,13 @@ export const requests: Request[] = [
     status: RequestStatus.APPROVED,
     createdBy: 'user-supervisor-2',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-    endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-28T12:30:00.000Z",
+    updatedAt: "2024-07-29T00:30:00.000Z",
+    startDate: "2024-07-31T00:00:00.000Z",
+    endDate: "2024-08-03T00:00:00.000Z",
     documents: [],
     messages: [
-      { id: 'msg-2-1', requestId: '2', senderId: 'user-cfo', content: 'Approved. Please proceed.', timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: true },
+      { id: 'msg-2-1', requestId: '2', senderId: 'user-cfo', content: 'Approved. Please proceed.', timestamp: "2024-07-28T13:30:00.000Z", type: MessageType.TEXT, seen: true },
     ]
   },
   {
@@ -83,11 +83,11 @@ export const requests: Request[] = [
     status: RequestStatus.WORK_COMPLETED,
     createdBy: 'user-current',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-24T12:30:00.000Z",
+    updatedAt: "2024-07-27T12:30:00.000Z",
     documents: [],
     messages: [
-      { id: 'msg-3-1', requestId: '3', senderId: 'system', content: 'Work marked as completed by You. Please upload GLAMS for payment.', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.SYSTEM, seen: true },
+      { id: 'msg-3-1', requestId: '3', senderId: 'system', content: 'Work marked as completed by You. Please upload GLAMS for payment.', timestamp: "2024-07-27T12:30:00.000Z", type: MessageType.SYSTEM, seen: true },
     ]
   },
    {
@@ -100,11 +100,11 @@ export const requests: Request[] = [
     status: RequestStatus.REJECTED,
     createdBy: 'user-supervisor-1',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-27T12:30:00.000Z",
+    updatedAt: "2024-07-28T12:30:00.00Z",
     documents: [],
     messages: [
-       { id: 'msg-4-1', requestId: '4', senderId: 'user-cfo', content: 'Rejected. Please provide a quotation before proceeding.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: true },
+       { id: 'msg-4-1', requestId: '4', senderId: 'user-cfo', content: 'Rejected. Please provide a quotation before proceeding.', timestamp: "2024-07-28T12:30:00.00Z", type: MessageType.TEXT, seen: true },
     ]
   },
   {
@@ -117,11 +117,11 @@ export const requests: Request[] = [
     status: RequestStatus.WORKING,
     createdBy: 'user-supervisor-2',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-26T12:30:00.000Z",
+    updatedAt: "2024-07-28T12:30:00.000Z",
     documents: [],
     messages: [
-        { id: 'msg-5-1', requestId: '5', senderId: 'user-supervisor-2', content: 'On my way to the site now.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: true },
+        { id: 'msg-5-1', requestId: '5', senderId: 'user-supervisor-2', content: 'On my way to the site now.', timestamp: "2024-07-28T12:30:00.000Z", type: MessageType.TEXT, seen: true },
     ]
   },
   {
@@ -134,11 +134,11 @@ export const requests: Request[] = [
     status: RequestStatus.PAYMENT_PENDING,
     createdBy: 'user-supervisor-2',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-19T12:30:00.000Z",
+    updatedAt: "2024-07-28T12:30:00.000Z",
     documents: [],
     messages: [
-        { id: 'msg-6-1', requestId: '6', senderId: 'system', content: 'Payment is pending for this trip. Please process.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.SYSTEM, seen: false },
+        { id: 'msg-6-1', requestId: '6', senderId: 'system', content: 'Payment is pending for this trip. Please process.', timestamp: "2024-07-28T12:30:00.000Z", type: MessageType.SYSTEM, seen: false },
     ]
   },
     {
@@ -151,11 +151,11 @@ export const requests: Request[] = [
     status: RequestStatus.PAYMENT_DONE,
     createdBy: 'user-current',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-14T12:30:00.000Z",
+    updatedAt: "2024-07-22T12:30:00.000Z",
     documents: [],
     messages: [
-        { id: 'msg-7-1', requestId: '7', senderId: 'system', content: 'Payment processed and completed.', timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.SYSTEM, seen: true },
+        { id: 'msg-7-1', requestId: '7', senderId: 'system', content: 'Payment processed and completed.', timestamp: "2024-07-22T12:30:00.000Z", type: MessageType.SYSTEM, seen: true },
     ]
   },
   {
@@ -168,17 +168,17 @@ export const requests: Request[] = [
     status: RequestStatus.OVERDUE,
     createdBy: 'user-supervisor-1',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-21T12:30:00.000Z",
+    updatedAt: "2024-07-29T11:30:00.000Z",
     documents: [],
     messages: [
-        { id: 'msg-8-1', requestId: '8', senderId: 'user-supervisor-1', content: 'Need this approved ASAP to avoid delays.', timestamp: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: true },
+        { id: 'msg-8-1', requestId: '8', senderId: 'user-supervisor-1', content: 'Need this approved ASAP to avoid delays.', timestamp: "2024-07-21T12:30:00.000Z", type: MessageType.TEXT, seen: true },
         { 
             id: 'msg-8-2', 
             requestId: '8', 
             senderId: 'user-cfo', 
             content: '', 
-            timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), 
+            timestamp: "2024-07-29T11:30:00.000Z", 
             type: MessageType.FILE,
             seen: true,
             file: {
@@ -200,11 +200,11 @@ export const requests: Request[] = [
     status: RequestStatus.PENDING,
     createdBy: 'user-supervisor-1',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-28T12:30:00.000Z",
+    updatedAt: "2024-07-28T12:30:00.000Z",
     documents: [],
     messages: [
-        { id: 'msg-9-1', requestId: '9', senderId: 'system', content: 'Request for servicing created. Awaiting approval.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.SYSTEM, seen: true },
+        { id: 'msg-9-1', requestId: '9', senderId: 'system', content: 'Request for servicing created. Awaiting approval.', timestamp: "2024-07-28T12:30:00.000Z", type: MessageType.SYSTEM, seen: true },
     ]
   },
    {
@@ -217,13 +217,13 @@ export const requests: Request[] = [
     status: RequestStatus.APPROVED,
     createdBy: 'user-current',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-    endDate: new Date(Date.now() + 11 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-25T12:30:00.000Z",
+    updatedAt: "2024-07-27T12:30:00.000Z",
+    startDate: "2024-08-05T00:00:00.000Z",
+    endDate: "2024-08-09T00:00:00.000Z",
     documents: [{name: "conference_pass.pdf", url: "#"}],
     messages: [
-        { id: 'msg-10-1', requestId: '10', senderId: 'user-cfo', content: 'Trip to Goa is approved. Ensure all toll receipts are submitted.', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: true },
+        { id: 'msg-10-1', requestId: '10', senderId: 'user-cfo', content: 'Trip to Goa is approved. Ensure all toll receipts are submitted.', timestamp: "2024-07-27T12:30:00.000Z", type: MessageType.TEXT, seen: true },
     ]
   },
   {
@@ -236,11 +236,11 @@ export const requests: Request[] = [
     status: RequestStatus.WORK_COMPLETED,
     createdBy: 'user-supervisor-1',
     cfo: 'user-cfo',
-    createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2024-07-23T12:30:00.000Z",
+    updatedAt: "2024-07-24T12:30:00.000Z",
     documents: [{name: "puncture_bill.jpg", url: "#"}],
     messages: [
-        { id: 'msg-11-1', requestId: '11', senderId: 'system', content: 'Work completed. Please submit bills for reimbursement.', timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), type: MessageType.SYSTEM, seen: true },
+        { id: 'msg-11-1', requestId: '11', senderId: 'system', content: 'Work completed. Please submit bills for reimbursement.', timestamp: "2024-07-24T12:30:00.000Z", type: MessageType.SYSTEM, seen: true },
     ]
   }
 ];
