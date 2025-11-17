@@ -1,11 +1,9 @@
-
-
 import type { Message, Request, User } from "@/lib/types";
 import { MessageType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon, Paperclip, Truck, Car, Bike, Bus } from "lucide-react";
+import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon, Paperclip, Truck, Car, Bike, Bus, StopCircle } from "lucide-react";
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -14,7 +12,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { requests } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 
 interface ChatMessageProps {
@@ -26,6 +24,7 @@ interface ChatMessageProps {
 function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
     const audioRef = useRef<HTMLAudioElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [progress, setProgress] = useState(0);
 
     const handlePlayPause = () => {
         if (audioRef.current) {
@@ -36,6 +35,18 @@ function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
             }
         }
     };
+    
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        const updateProgress = () => {
+            setProgress((audio.currentTime / audio.duration) * 100);
+        };
+
+        audio.addEventListener('timeupdate', updateProgress);
+        return () => audio.removeEventListener('timeupdate', updateProgress);
+    }, []);
 
 
     switch (file.type) {
@@ -62,15 +73,15 @@ function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
                         src={file.url}
                         onPlay={() => setIsPlaying(true)}
                         onPause={() => setIsPlaying(false)}
-                        onEnded={() => setIsPlaying(false)}
+                        onEnded={() => { setIsPlaying(false); setProgress(0); }}
                     />
-                    <Button size="icon" variant="secondary" className="rounded-full h-10 w-10" onClick={handlePlayPause}>
+                    <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 flex-shrink-0" onClick={handlePlayPause}>
                         <Play className={cn("size-5", isPlaying && "hidden")} />
                         <StopCircle className={cn("size-5", !isPlaying && "hidden")} />
                     </Button>
                     <div className="flex-1 space-y-1">
-                        <div className="h-1.5 w-full rounded-full bg-muted-foreground/30">
-                            <div className="h-full w-1/3 rounded-full bg-primary"></div>
+                         <div className="h-1.5 w-full rounded-full bg-muted-foreground/30 relative overflow-hidden">
+                            <div className="h-full bg-primary absolute" style={{ width: `${progress}%` }}></div>
                         </div>
                         <span className="text-xs text-muted-foreground">{file.size}</span>
                     </div>
@@ -279,4 +290,3 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
     </div>
   );
 }
-

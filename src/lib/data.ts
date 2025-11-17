@@ -29,7 +29,23 @@ export const requests: Request[] = [
     documents: [{ name: 'invoice_123.pdf', url: '#' }],
     messages: [
       { id: 'msg-1-1', requestId: '1', senderId: 'system', content: 'Request created by Phoenix Baker. Awaiting CFO approval.', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), type: MessageType.SYSTEM, seen: true },
-      { id: 'msg-1-2', requestId: '1', senderId: 'user-supervisor-1', content: 'Need this approved ASAP to avoid delays.', timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: false }
+      { id: 'msg-1-2', requestId: '1', senderId: 'user-supervisor-1', content: 'Need this approved ASAP to avoid delays.', timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), type: MessageType.TEXT, seen: false },
+      { 
+        id: 'msg-1-3', 
+        requestId: '1', 
+        senderId: 'user-cfo', 
+        content: '', 
+        timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), 
+        type: MessageType.FILE, 
+        seen: false,
+        file: {
+            name: 'cfo-voice-memo.webm',
+            // A silent 1-second webm file as a base64 data URL
+            url: 'data:audio/webm;base64,GkXfo6NChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAAkEnppYgAAAAAAMZXERA4AAAAAABobm+gMo4/3d/n7+P/8AgUAMZXERA4AAAAAABobm+gMo4/3d/n7+P/8AgUAAAAAAABhTrr4AAAAAABT/LgAAAAAAABf/73/8//8AAAAAAAAB8v//+P///////////////////////////////////////////////+AAAAA=',
+            type: 'voice',
+            size: '2 KB'
+        }
+      }
     ]
   },
   {
