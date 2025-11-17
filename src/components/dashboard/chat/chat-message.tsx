@@ -21,7 +21,7 @@ interface ChatMessageProps {
   isCurrentUser: boolean;
 }
 
-function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
+function FileMessageContent({ file, isCurrentUser }: { file: NonNullable<Message['file']>, isCurrentUser: boolean }) {
     const audioRef = useRef<HTMLAudioElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -62,57 +62,78 @@ function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
     }, []);
 
 
-    switch (file.type) {
-        case 'image':
-            return (
-                <div className="relative aspect-video w-full max-w-sm overflow-hidden rounded-lg">
-                    <Image src={file.url} alt={file.name} fill className="object-cover" />
-                </div>
-            );
-        case 'video':
-            return (
-                <div className="relative flex aspect-video w-full max-w-sm items-center justify-center overflow-hidden rounded-lg bg-black">
-                    <video src={file.url} className="h-full w-full object-cover" />
-                    <div className="absolute grid size-12 place-content-center rounded-full bg-black/50 text-white">
-                        <Play className="size-6 fill-current" />
+    const renderContent = () => {
+        switch (file.type) {
+            case 'image':
+                return (
+                    <a href={file.url} target="_blank" rel="noopener noreferrer" className="block relative aspect-square w-full max-w-xs overflow-hidden rounded-lg">
+                        <Image src={file.url} alt={file.name} layout="fill" className="object-cover" />
+                    </a>
+                );
+            case 'video':
+                return (
+                     <div className="relative flex aspect-video w-full max-w-sm items-center justify-center overflow-hidden rounded-lg bg-black">
+                        <video src={file.url} className="h-full w-full object-cover" controls />
                     </div>
-                </div>
-            );
-        case 'voice':
-            return (
-                <div className="flex items-center gap-2 p-2 rounded-lg bg-background/30 w-64">
-                    <audio 
-                        ref={audioRef} 
-                        src={file.url}
-                    />
-                    <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 flex-shrink-0" onClick={handlePlayPause}>
-                        <Play className={cn("size-5", isPlaying && "hidden")} />
-                        <StopCircle className={cn("size-5", !isPlaying && "hidden")} />
-                    </Button>
-                    <div className="flex-1 space-y-1">
-                         <div className="h-1.5 w-full rounded-full bg-muted-foreground/30 relative overflow-hidden">
-                            <div className="h-full bg-primary absolute" style={{ width: `${progress}%` }}></div>
+                );
+            case 'voice':
+                return (
+                     <div className={cn(
+                        "flex items-center gap-2 p-2 rounded-lg w-64",
+                        isCurrentUser ? "bg-primary/80" : "bg-background/50"
+                    )}>
+                        <audio 
+                            ref={audioRef} 
+                            src={file.url}
+                            preload="metadata"
+                        />
+                        <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 flex-shrink-0 bg-background/30 hover:bg-background/50 text-foreground" onClick={handlePlayPause}>
+                            <Play className={cn("size-5 fill-current", isPlaying && "hidden")} />
+                            <StopCircle className={cn("size-5 fill-current", !isPlaying && "hidden")} />
+                        </Button>
+                        <div className="flex-1 space-y-1">
+                             <div className="h-1.5 w-full rounded-full bg-muted-foreground/30 relative overflow-hidden">
+                                <div className="h-full bg-foreground/80 absolute" style={{ width: `${progress}%` }}></div>
+                            </div>
+                            <span className="text-xs text-foreground/80">{file.size}</span>
                         </div>
-                        <span className="text-xs text-muted-foreground">{file.size}</span>
                     </div>
-                </div>
-            );
-        default:
-            return (
-                <div className="flex items-center gap-3 rounded-lg border bg-background/50 p-3">
-                    <FileIcon className="size-8 shrink-0 text-muted-foreground" />
-                    <div className="flex-1">
-                        <p className="truncate font-medium">{file.name}</p>
-                        <p className="text-sm text-muted-foreground">{file.size || 'N/A'}</p>
+                );
+            default:
+                const getFileIcon = () => {
+                    if (file.name.endsWith('.pdf')) return <FileText className="h-8 w-8 text-red-500" />;
+                    if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) return <FileText className="h-8 w-8 text-blue-500" />;
+                    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) return <FileText className="h-8 w-8 text-green-500" />;
+                    return <FileIcon className="h-8 w-8 text-muted-foreground" />;
+                }
+                return (
+                     <div className={cn(
+                        "flex items-center gap-3 rounded-lg border p-3 w-80 max-w-full",
+                         isCurrentUser ? "bg-primary/80 border-primary-foreground/20" : "bg-card border-border"
+                    )}>
+                        <div className="flex-shrink-0">{getFileIcon()}</div>
+                        <div className="flex-1 min-w-0">
+                            <p className="truncate font-medium text-sm">{file.name}</p>
+                            <p className="text-xs text-foreground/80">{file.size || 'N/A'}</p>
+                        </div>
+                        <Button size="icon" variant="ghost" className="flex-shrink-0 h-9 w-9" asChild>
+                            <a href={file.url} download>
+                                <Download className="size-5" />
+                            </a>
+                        </Button>
                     </div>
-                    <Button size="icon" variant="ghost" asChild>
-                        <a href={file.url} download>
-                            <Download className="size-5" />
-                        </a>
-                    </Button>
-                </div>
-            );
+                );
+        }
     }
+    
+    return (
+        <div className={cn(
+            "p-1.5 rounded-lg",
+            isCurrentUser ? 'bg-primary' : 'bg-card'
+        )}>
+            {renderContent()}
+        </div>
+    )
 }
 
 function RequestDetailsMessage({ request }: { request: Request }) {
@@ -245,11 +266,7 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
          )
         case MessageType.FILE:
             if (!message.file) return null;
-             return (
-                 <div className={cn("rounded-lg p-2", isCurrentUser ? "bg-primary" : "bg-card")}>
-                    <FileMessageContent file={message.file} />
-                </div>
-            )
+             return <FileMessageContent file={message.file} isCurrentUser={isCurrentUser} />;
         case MessageType.REQUEST_DETAILS:
              return request ? <RequestDetailsMessage request={request} /> : null;
       case MessageType.TEXT:
@@ -297,3 +314,5 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
     </div>
   );
 }
+
+    
