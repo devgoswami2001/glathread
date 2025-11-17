@@ -1,4 +1,5 @@
 
+
 export type User = {
   id: string;
   name: string;
@@ -28,7 +29,8 @@ export type Message = {
   file?: {
     name: string;
     url: string;
-    type: 'image' | 'video' | 'pdf' | 'docx' | 'voice';
+    type: 'image' | 'video' | 'pdf' | 'docx' | 'voice' | 'file';
+    size?: string;
   };
 };
 
