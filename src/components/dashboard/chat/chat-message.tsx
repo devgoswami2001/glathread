@@ -1,16 +1,20 @@
 
-import type { Message, User } from "@/lib/types";
+
+import type { Message, Request, User } from "@/lib/types";
 import { MessageType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon } from "lucide-react";
+import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon, Paperclip, Truck, Car, Bike, Bus } from "lucide-react";
 import { format } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import Link from "next/link";
 import Image from "next/image";
+import { requests } from "@/lib/data";
+import { Separator } from "@/components/ui/separator";
+
 
 interface ChatMessageProps {
   message: Message;
@@ -67,8 +71,65 @@ function FileMessageContent({ file }: { file: NonNullable<Message['file']> }) {
     }
 }
 
+function RequestDetailsMessage({ request }: { request: Request }) {
+    const getVehicleIcon = (vehicleType: string) => {
+        switch(vehicleType) {
+            case 'Car': return <Car className="h-6 w-6 text-primary" />;
+            case 'Truck': return <Truck className="h-6 w-6 text-primary" />;
+            case 'Bike': return <Bike className="h-6 w-6 text-primary" />;
+            case 'Bus': return <Bus className="h-6 w-6 text-primary" />;
+            default: return <Car className="h-6 w-6 text-primary" />;
+        }
+    }
+
+    return (
+        <Card className="bg-secondary/50 border-dashed">
+            <CardHeader>
+                <div className="flex items-start gap-4">
+                    <div className="bg-primary/10 p-3 rounded-full">
+                        {getVehicleIcon(request.vehicleType)}
+                    </div>
+                    <div>
+                        <CardTitle className="text-base font-semibold leading-tight">{request.title}</CardTitle>
+                        <CardDescription className="text-sm mt-1">{request.vehicleDetails}</CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-2">
+                <Separator/>
+                <div className="space-y-1">
+                    <p className="font-medium text-sm">Description</p>
+                    <p className="text-muted-foreground text-sm">{request.messages.find(m => m.type === MessageType.TEXT)?.content || "No description provided."}</p>
+                </div>
+                {request.documents.length > 0 && (
+                    <div>
+                        <p className="font-medium text-sm mb-2">Documents</p>
+                        <div className="space-y-2">
+                            {request.documents.map((doc, index) => (
+                                <div key={index} className="flex items-center justify-between rounded-md border bg-background/50 p-2 text-sm">
+                                    <div className="flex items-center gap-2 truncate">
+                                        <Paperclip className="h-4 w-4 text-muted-foreground" />
+                                        <span className="truncate">{doc.name}</span>
+                                    </div>
+                                    <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                                        <a href={doc.url} download>
+                                            <Download className="h-4 w-4"/>
+                                        </a>
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    )
+}
+
 
 export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps) {
+  const request = requests.find(r => r.id === message.requestId);
+
   const renderMessageContent = () => {
     switch (message.type) {
       case MessageType.APPROVAL:
@@ -140,6 +201,8 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
          )
         case MessageType.FILE:
             return message.file ? <FileMessageContent file={message.file} /> : null;
+        case MessageType.REQUEST_DETAILS:
+             return request ? <RequestDetailsMessage request={request} /> : null;
       case MessageType.TEXT:
         return (
             <div
@@ -158,7 +221,7 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
     }
   };
   
-  if (message.type === MessageType.SYSTEM || message.type.includes('prompt') || message.type.includes('approval') || message.type.includes('pass') || message.type.includes('payment')) {
+  if ([MessageType.SYSTEM, MessageType.APPROVAL, MessageType.DATE_PROMPT, MessageType.OUTPASS_GENERATION, MessageType.PAYMENT_TRACKING, MessageType.REQUEST_DETAILS].includes(message.type)) {
     return <div className="my-2">{renderMessageContent()}</div>;
   }
 

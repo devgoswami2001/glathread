@@ -1,5 +1,6 @@
 
 
+
 export type User = {
   id: string;
   name: string;
@@ -15,7 +16,8 @@ export enum MessageType {
   OUTPASS_GENERATION = 'outpass_generation',
   DEADLINE_MISSED = 'deadline_missed',
   PAYMENT_TRACKING = 'payment_tracking',
-  FILE = 'file'
+  FILE = 'file',
+  REQUEST_DETAILS = 'request_details'
 }
 
 export type Message = {
