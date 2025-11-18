@@ -11,5 +11,5 @@ export default function RequestPage({ params }: { params: { id: string } }) {
     notFound();
   }
 
-  return <ChatLayout request={request} users={users} currentUser={currentUser} />;
+  return <div className="h-full -m-4 md:-m-6"><ChatLayout request={request} users={users} currentUser={currentUser} /></div>;
 }

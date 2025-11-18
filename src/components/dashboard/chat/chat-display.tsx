@@ -28,7 +28,7 @@ export function ChatDisplay({ request, users, currentUser, onBack }: ChatDisplay
   return (
     <div className="flex h-full flex-col">
       <ChatTopbar request={request} onBack={onBack} />
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-20">
         <ChatMessageList request={request} users={users} currentUser={currentUser} />
       </div>
       <ChatMessageInput />
