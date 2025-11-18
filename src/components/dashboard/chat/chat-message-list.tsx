@@ -14,21 +14,19 @@ interface ChatMessageListProps {
 
 export function ChatMessageList({ request, users, currentUser }: ChatMessageListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      const viewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
-      if (viewport) {
-        viewport.scrollTo({
-          top: viewport.scrollHeight,
+    if (viewportRef.current) {
+        viewportRef.current.scrollTo({
+          top: viewportRef.current.scrollHeight,
           behavior: 'smooth',
         });
-      }
     }
   }, [request.messages]);
   
   return (
-    <ScrollArea className="flex-1" ref={scrollAreaRef}>
+    <ScrollArea className="flex-1" ref={scrollAreaRef} viewportRef={viewportRef}>
       <div className="p-4 md:p-6">
         <div className="flex flex-col gap-4 max-w-2xl mx-auto">
           {request.messages.map((message) => {
