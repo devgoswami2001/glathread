@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Input } from "@/components/ui/input";
@@ -48,7 +47,6 @@ export function ChatMessageInput() {
         title: "File Selected",
         description: `${file.name} is ready to be sent.`,
       });
-      // Here you would typically handle the file upload process
     }
   };
 
@@ -121,8 +119,6 @@ export function ChatMessageInput() {
   };
 
   const handleSendMessage = async () => {
-     // This is a placeholder for sending a message.
-     // In a real app, you would get the current request from context or props.
     const currentRequest: Request | undefined = requests[0];
     if (!currentRequest) return;
 
@@ -180,7 +176,7 @@ export function ChatMessageInput() {
   }, [audioPreviewUrl]);
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm p-2 md:p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.05)]">
+    <div className="bg-background/95 backdrop-blur-sm p-2 md:p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.05)]">
       <input
         type="file"
         ref={fileInputRef}

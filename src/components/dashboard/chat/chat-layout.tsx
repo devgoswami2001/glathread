@@ -12,7 +12,7 @@ interface ChatLayoutProps {
 
 export function ChatLayout({ request, users, currentUser }: ChatLayoutProps) {
   return (
-    <div className="relative flex h-full w-full bg-muted/20 overflow-hidden">
+    <div className="relative flex h-full w-full flex-col bg-muted/20 overflow-hidden">
         <AnimatePresence>
             <motion.div 
                 key={request?.id || 'no-chat'}

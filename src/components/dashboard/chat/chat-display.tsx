@@ -1,4 +1,3 @@
-
 import type { Request, User } from "@/lib/types";
 import { ChatTopbar } from "./chat-topbar";
 import { ChatMessageList } from "./chat-message-list";
@@ -31,9 +30,7 @@ export function ChatDisplay({ request, users, currentUser, onBack }: ChatDisplay
       <div className="flex-1 overflow-y-auto">
         <ChatMessageList request={request} users={users} currentUser={currentUser} />
       </div>
-      <div className="mt-auto">
-        <ChatMessageInput />
-      </div>
+      <ChatMessageInput />
     </div>
   );
 }
