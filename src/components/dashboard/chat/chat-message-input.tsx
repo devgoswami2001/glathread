@@ -9,7 +9,6 @@ import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { Message, MessageType, Request } from "@/lib/types";
-import { requests } from "@/lib/data";
 
 function WaveformAnimation() {
     return (
@@ -39,8 +38,13 @@ type FilePreview = {
   file: File;
 };
 
+interface ChatMessageInputProps {
+  request: Request;
+  addMessage: (message: Message) => void;
+}
 
-export function ChatMessageInput() {
+
+export function ChatMessageInput({ request, addMessage }: ChatMessageInputProps) {
   const [message, setMessage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -134,15 +138,16 @@ export function ChatMessageInput() {
   };
 
   const handleSendMessage = async () => {
-    const currentRequest: Request | undefined = requests[0];
-    if (!currentRequest) return;
+    if (!request) return;
+
+    const messageId = `msg-${request.id}-${Date.now()}`;
 
     // Handle file message
     if (filePreview) {
         const dataUrl = await blobToBase64(filePreview.file);
         const newMessage: Message = {
-            id: `msg-${currentRequest.id}-${currentRequest.messages.length + 1}`,
-            requestId: currentRequest.id,
+            id: messageId,
+            requestId: request.id,
             senderId: 'user-current',
             content: message, // Caption for the file
             timestamp: new Date().toISOString(),
@@ -155,21 +160,21 @@ export function ChatMessageInput() {
                 size: `${(filePreview.file.size / 1024).toFixed(2)} KB`
             }
         };
-        currentRequest.messages.push(newMessage);
+        addMessage(newMessage);
         setFilePreview(null);
         setMessage('');
         toast({ title: "Message sent!" });
     } else if (message.trim()) { // Handle text message
          const newMessage: Message = {
-            id: `msg-${currentRequest.id}-${currentRequest.messages.length + 1}`,
-            requestId: currentRequest.id,
+            id: messageId,
+            requestId: request.id,
             senderId: 'user-current',
             content: message,
             timestamp: new Date().toISOString(),
             type: MessageType.TEXT,
             seen: false,
         };
-        currentRequest.messages.push(newMessage);
+        addMessage(newMessage);
         setMessage('');
     }
   };

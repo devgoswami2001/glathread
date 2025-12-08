@@ -1,8 +1,9 @@
 'use client';
 
-import type { Request, User } from '@/lib/types';
+import type { Message, Request, User } from '@/lib/types';
 import { ChatDisplay } from './chat-display';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
 
 interface ChatLayoutProps {
   request: Request | null;
@@ -10,7 +11,19 @@ interface ChatLayoutProps {
   currentUser: User;
 }
 
-export function ChatLayout({ request, users, currentUser }: ChatLayoutProps) {
+export function ChatLayout({ request: initialRequest, users, currentUser }: ChatLayoutProps) {
+  const [request, setRequest] = useState(initialRequest);
+
+  const addMessage = (newMessage: Message) => {
+    setRequest(prevRequest => {
+      if (!prevRequest) return null;
+      return {
+        ...prevRequest,
+        messages: [...prevRequest.messages, newMessage],
+      };
+    });
+  };
+  
   return (
     <div className="relative flex h-full w-full flex-col bg-muted/20 overflow-hidden">
         <AnimatePresence>
@@ -26,6 +39,7 @@ export function ChatLayout({ request, users, currentUser }: ChatLayoutProps) {
                     request={request} 
                     users={users} 
                     currentUser={currentUser!}
+                    addMessage={addMessage}
                 />
             </motion.div>
         </AnimatePresence>

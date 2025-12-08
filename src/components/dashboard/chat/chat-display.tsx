@@ -1,4 +1,4 @@
-import type { Request, User } from "@/lib/types";
+import type { Message, Request, User } from "@/lib/types";
 import { ChatTopbar } from "./chat-topbar";
 import { ChatMessageList } from "./chat-message-list";
 import { ChatMessageInput } from "./chat-message-input";
@@ -9,9 +9,10 @@ interface ChatDisplayProps {
   users: User[];
   currentUser: User;
   onBack?: () => void;
+  addMessage: (message: Message) => void;
 }
 
-export function ChatDisplay({ request, users, currentUser, onBack }: ChatDisplayProps) {
+export function ChatDisplay({ request, users, currentUser, onBack, addMessage }: ChatDisplayProps) {
   if (!request) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
@@ -30,7 +31,7 @@ export function ChatDisplay({ request, users, currentUser, onBack }: ChatDisplay
       <div className="flex-1 overflow-y-auto">
         <ChatMessageList request={request} users={users} currentUser={currentUser} />
       </div>
-      <ChatMessageInput />
+      <ChatMessageInput request={request} addMessage={addMessage} />
     </div>
   );
 }
