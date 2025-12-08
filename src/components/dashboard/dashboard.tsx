@@ -1,3 +1,4 @@
+
 'use client';
 
 import { requests } from "@/lib/data";
@@ -53,7 +54,7 @@ export function Dashboard() {
   });
 
   const todaysPendency = requests.filter(r => r.status === RequestStatus.PENDING && isToday(new Date(r.createdAt))).length;
-  const todaysWork = requests.filter(r => r.status === RequestStatus.WORKING && isToday(new Date(r.updatedAt))).length;
+  const todaysWork = requests.filter(r => r.status === RequestStatus.WORKING && isToday(new Date(r.createdAt))).length;
 
 
   return (
@@ -91,7 +92,7 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
                 <div className="text-4xl font-bold text-cyan-500">{todaysWork}</div>
-                <p className="text-xs text-muted-foreground">Requests currently in 'Working' status today</p>
+                <p className="text-xs text-muted-foreground">Requests created today and in 'Working' status</p>
             </CardContent>
         </Card>
       </div>
