@@ -7,8 +7,10 @@ import { SearchFilterBar } from "./search-filter-bar";
 import { RequestList } from "./request-list";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, CalendarClock, Briefcase } from "lucide-react";
 import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { isToday } from 'date-fns';
 
 export function Dashboard() {
   const [filteredRequests, setFilteredRequests] = useState<Request[]>(requests);
@@ -50,6 +52,10 @@ export function Dashboard() {
     overdue: 0,
   });
 
+  const todaysPendency = requests.filter(r => r.status === RequestStatus.PENDING && isToday(new Date(r.createdAt))).length;
+  const todaysWork = requests.filter(r => r.status === RequestStatus.WORKING && isToday(new Date(r.updatedAt))).length;
+
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -66,6 +72,30 @@ export function Dashboard() {
       </div>
 
       <QuickStats stats={stats} />
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <Card className="border-2 border-black/20 bg-card shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] transition-transform hover:scale-[1.02]">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-base font-semibold text-muted-foreground">Today's Pendency</CardTitle>
+                <CalendarClock className="h-5 w-5 text-amber-500" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-4xl font-bold text-amber-500">{todaysPendency}</div>
+                <p className="text-xs text-muted-foreground">New requests awaiting approval today</p>
+            </CardContent>
+        </Card>
+        <Card className="border-2 border-black/20 bg-card shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] transition-transform hover:scale-[1.02]">
+             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-base font-semibold text-muted-foreground">Today's Work</CardTitle>
+                <Briefcase className="h-5 w-5 text-cyan-500" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-4xl font-bold text-cyan-500">{todaysWork}</div>
+                <p className="text-xs text-muted-foreground">Requests currently in 'Working' status today</p>
+            </CardContent>
+        </Card>
+      </div>
+
       <SearchFilterBar onFilterChange={setFilteredRequests} />
       <RequestList requests={filteredRequests} />
 
