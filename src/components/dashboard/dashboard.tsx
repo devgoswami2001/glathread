@@ -8,10 +8,11 @@ import { SearchFilterBar } from "./search-filter-bar";
 import { RequestList } from "./request-list";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { PlusCircle, CalendarClock, Briefcase } from "lucide-react";
+import { PlusCircle, CalendarClock, Briefcase, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "../ui/card";
 import { isToday } from 'date-fns';
+import { Badge } from "../ui/badge";
 
 export function Dashboard() {
   const [filteredRequests, setFilteredRequests] = useState<Request[]>(requests);
@@ -53,8 +54,8 @@ export function Dashboard() {
     overdue: 0,
   });
 
-  const todaysPendency = requests.filter(r => r.status === RequestStatus.PENDING && isToday(new Date(r.createdAt))).length;
-  const todaysWork = requests.filter(r => r.status === RequestStatus.WORKING && isToday(new Date(r.createdAt))).length;
+  const todaysPendency = requests.filter(r => r.status === RequestStatus.PENDING && isToday(new Date(r.createdAt))).slice(0, 5);
+  const todaysWork = requests.filter(r => r.status === RequestStatus.WORKING && isToday(new Date(r.createdAt))).slice(0, 5);
 
 
   return (
@@ -74,25 +75,69 @@ export function Dashboard() {
 
       <QuickStats stats={stats} />
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <Card className="border-2 border-black/20 bg-card shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] transition-transform hover:scale-[1.02]">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-base font-semibold text-muted-foreground">Today's Pendency</CardTitle>
-                <CalendarClock className="h-5 w-5 text-amber-500" />
+      <div className="grid gap-4 md:grid-cols-2 lg:gap-6">
+        <Card className="flex flex-col">
+            <CardHeader className="flex flex-row items-center">
+                <div className="grid gap-2">
+                    <CardTitle>Today's Pendency</CardTitle>
+                    <CardDescription>New requests created today that are awaiting approval.</CardDescription>
+                </div>
+                 <Button asChild size="sm" className="ml-auto gap-1">
+                    <Link href="#">View All <ArrowRight className="h-4 w-4" /></Link>
+                 </Button>
             </CardHeader>
-            <CardContent>
-                <div className="text-4xl font-bold text-amber-500">{todaysPendency}</div>
-                <p className="text-xs text-muted-foreground">New requests awaiting approval today</p>
+            <CardContent className="flex-1">
+                <div className="grid gap-3">
+                    {todaysPendency.length > 0 ? todaysPendency.map(request => (
+                       <div key={request.id} className="flex items-center gap-4 p-3 bg-secondary/50 rounded-lg">
+                           <div className="flex-1 space-y-1">
+                               <p className="text-sm font-medium leading-none truncate">{request.title}</p>
+                               <p className="text-sm text-muted-foreground">{request.vehicleDetails}</p>
+                           </div>
+                           <Badge className="bg-amber-500 text-white">Pending</Badge>
+                           <Button variant="outline" size="icon" className="h-8 w-8" asChild>
+                             <Link href={`/dashboard/requests/${request.id.replace('TR-','')}`}><ArrowRight className="h-4 w-4" /></Link>
+                           </Button>
+                       </div>
+                    )) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                            <CalendarClock className="mx-auto h-8 w-8 mb-2" />
+                            <p>No pending requests for today.</p>
+                        </div>
+                    )}
+                </div>
             </CardContent>
         </Card>
-        <Card className="border-2 border-black/20 bg-card shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] transition-transform hover:scale-[1.02]">
-             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-base font-semibold text-muted-foreground">Today's Work</CardTitle>
-                <Briefcase className="h-5 w-5 text-cyan-500" />
+        <Card className="flex flex-col">
+             <CardHeader className="flex flex-row items-center">
+                <div className="grid gap-2">
+                    <CardTitle>Today's Work</CardTitle>
+                    <CardDescription>Requests created today that are currently in progress.</CardDescription>
+                </div>
+                 <Button asChild size="sm" className="ml-auto gap-1">
+                    <Link href="#">View All <ArrowRight className="h-4 w-4" /></Link>
+                 </Button>
             </CardHeader>
-            <CardContent>
-                <div className="text-4xl font-bold text-cyan-500">{todaysWork}</div>
-                <p className="text-xs text-muted-foreground">Requests created today and in 'Working' status</p>
+            <CardContent className="flex-1">
+                 <div className="grid gap-3">
+                    {todaysWork.length > 0 ? todaysWork.map(request => (
+                       <div key={request.id} className="flex items-center gap-4 p-3 bg-secondary/50 rounded-lg">
+                           <div className="flex-1 space-y-1">
+                               <p className="text-sm font-medium leading-none truncate">{request.title}</p>
+                               <p className="text-sm text-muted-foreground">{request.vehicleDetails}</p>
+                           </div>
+                           <Badge className="bg-cyan-500 text-white">Working</Badge>
+                           <Button variant="outline" size="icon" className="h-8 w-8" asChild>
+                             <Link href={`/dashboard/requests/${request.id.replace('TR-','')}`}><ArrowRight className="h-4 w-4" /></Link>
+                           </Button>
+                       </div>
+                    )) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                            <Briefcase className="mx-auto h-8 w-8 mb-2" />
+                            <p>No work started for today's requests.</p>
+                        </div>
+                    )}
+                </div>
             </CardContent>
         </Card>
       </div>
@@ -110,3 +155,5 @@ export function Dashboard() {
     </>
   );
 }
+
+    
