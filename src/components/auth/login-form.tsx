@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -11,16 +12,55 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
-  
-  const handleLogin = (e: React.FormEvent) => {
-      e.preventDefault();
-      router.push('/dashboard');
-  }
+  const { toast } = useToast();
+  const [email, setEmail] = useState("d@d.com");
+  const [password, setPassword] = useState("password");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Login Successful",
+          description: `Welcome, ${data.user.full_name}!`,
+        });
+        // Here you would typically save the tokens, e.g., in localStorage or a cookie
+        // localStorage.setItem('accessToken', data.access);
+        // localStorage.setItem('refreshToken', data.refresh);
+        router.push('/dashboard');
+      } else {
+        throw new Error(data.detail || "Failed to log in.");
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: error.message || "There was a problem with your request.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Card className="w-full max-w-sm">
@@ -34,15 +74,31 @@ export function LoginForm() {
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required defaultValue="supervisor@glathread.app" />
+            <Input
+              id="email"
+              type="email"
+              placeholder="m@example.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required defaultValue="password" />
+            <Input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
+            />
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full" type="submit">
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Log In
           </Button>
         </CardFooter>
