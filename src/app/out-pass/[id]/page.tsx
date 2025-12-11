@@ -8,7 +8,8 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 
 export default function OutPassPage({ params }: { params: { id: string } }) {
-    const request = requests.find(r => r.id === params.id);
+    const { id } = params;
+    const request = requests.find(r => r.id === id);
 
     if (!request) {
         notFound();

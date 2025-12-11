@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { Request, User } from "@/lib/types";
@@ -10,9 +9,10 @@ interface ChatMessageListProps {
   request: Request;
   users: User[];
   currentUser: User;
+  onApprovalAction: (status: 'approved' | 'rejected') => void;
 }
 
-export function ChatMessageList({ request, users, currentUser }: ChatMessageListProps) {
+export function ChatMessageList({ request, users, currentUser, onApprovalAction }: ChatMessageListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
 
@@ -32,14 +32,16 @@ export function ChatMessageList({ request, users, currentUser }: ChatMessageList
           {request.messages.map((message) => {
              const sender = message.senderId === 'system' 
               ? { id: 'system', name: 'System', avatar: '/logo.svg', role: 'CFO' as const } 
-              : users.find((u) => u.id === message.senderId);
+              : users.find((u) => u.id === message.senderId) || { id: message.senderId, name: 'Unknown User', avatar: '', role: 'Supervisor' as const};
 
             return (
               <ChatMessage
                 key={message.id}
                 message={message}
-                sender={sender!}
+                sender={sender}
                 isCurrentUser={message.senderId === currentUser.id}
+                request={request}
+                onApprovalAction={onApprovalAction}
               />
             );
           })}

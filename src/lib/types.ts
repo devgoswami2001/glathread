@@ -1,6 +1,5 @@
 
 
-
 export type User = {
   id: string;
   name: string;
@@ -17,8 +16,38 @@ export enum MessageType {
   DEADLINE_MISSED = 'deadline_missed',
   PAYMENT_TRACKING = 'payment_tracking',
   FILE = 'file',
-  REQUEST_DETAILS = 'request_details'
+  REQUEST_DETAILS = 'request_details',
+  PROGRESS_UPDATE = 'progress_update',
+  GATE_PASS_DETAILS = 'gate_pass_details',
+  GATE_PASS_UPDATE = 'gate_pass_update',
+  GATE_PASS_OUT = 'gate_pass_out',
+  GATE_PASS_IN = 'gate_pass_in',
 }
+
+export type ProgressUpdate = {
+  id: number;
+  progress_type: 'initial' | 'delay' | 'completed';
+  expected_end_date: string;
+  delay_reason: string | null;
+  updated_by: number;
+  updated_by_name: string;
+  created_at: string;
+}
+
+export type GatePass = {
+  id: number;
+  issued_to: number;
+  issued_to_name: string;
+  vehicle_number: string;
+  purpose: string;
+  valid_from: string;
+  valid_to: string;
+  status: string;
+  created_at: string;
+  pass_mode: 'in' | 'out';
+  out_time: string | null;
+  in_time: string | null;
+};
 
 export type Message = {
   id: string;
@@ -34,6 +63,8 @@ export type Message = {
     type: 'image' | 'video' | 'pdf' | 'docx' | 'voice' | 'file';
     size?: string;
   };
+  progress?: ProgressUpdate;
+  gatePass?: GatePass;
 };
 
 export enum RequestStatus {
@@ -66,16 +97,18 @@ export enum VehicleType {
     GOLF_CART = 'Golf Cart',
     E_RICKSHAW = 'E-Rickshaw',
     E_LOADER = 'E-Loader',
+    AMBULANCE = 'Ambulance',
+    OTHER = 'Other'
 }
 
 export type Request = {
   id: string;
   title: string;
-  vehicleType: VehicleType;
+  vehicleType: VehicleType | string;
   vehicleNumber: string;
   vehicleDetails: string;
-  requestType: RequestType;
-  status: RequestStatus;
+  requestType: RequestType | string;
+  status: RequestStatus | string;
   createdBy: string; // supervisor's user ID
   cfo: string; // cfo's user ID
   createdAt: string;
@@ -85,4 +118,5 @@ export type Request = {
   startDate?: string;
   endDate?: string;
   outpass_qr?: string;
+  apiData?: any; // To store the raw API thread object
 };

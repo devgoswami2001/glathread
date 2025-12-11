@@ -1,18 +1,19 @@
+
+
 'use client';
 
-import type { Message, Request, User } from "@/lib/types";
+import type { Message, Request, User, ProgressUpdate, GatePass } from "@/lib/types";
 import { MessageType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon, Paperclip, Truck, Car, Bike, Bus, StopCircle, FileType2, Sheet } from "lucide-react";
+import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon, Paperclip, Truck, Car, Bike, Bus, StopCircle, FileType2, Sheet, User as UserIcon, Calendar, AlertTriangle, Clock, CalendarCheck2, Info, LogIn, LogOut } from "lucide-react";
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import Link from "next/link";
 import Image from "next/image";
-import { requests } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
 import { useRef, useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -23,18 +24,20 @@ interface ChatMessageProps {
   message: Message;
   sender: User;
   isCurrentUser: boolean;
+  request: Request;
+  onApprovalAction: (status: 'approved' | 'rejected') => void;
 }
 
-function getStatusClass(status: RequestStatus) {
-    switch (status) {
-        case RequestStatus.PENDING: return "bg-amber-100 text-amber-700 border-amber-200";
-        case RequestStatus.APPROVED: return "bg-blue-100 text-blue-700 border-blue-200";
-        case RequestStatus.WORKING: return "bg-teal-100 text-teal-700 border-teal-200";
-        case RequestStatus.WORK_COMPLETED: return "bg-sky-100 text-sky-700 border-sky-200";
-        case RequestStatus.PAYMENT_PENDING: return "bg-orange-100 text-orange-700 border-orange-200";
-        case RequestStatus.PAYMENT_DONE: return "bg-green-100 text-green-700 border-green-200";
-        case RequestStatus.REJECTED: return "bg-red-100 text-red-700 border-red-200";
-        case RequestStatus.OVERDUE: return "bg-rose-100 text-rose-700 border-rose-200";
+function getStatusClass(status: RequestStatus | string) {
+    switch (status.toLowerCase()) {
+        case RequestStatus.PENDING.toLowerCase(): return "bg-amber-100 text-amber-700 border-amber-200";
+        case RequestStatus.APPROVED.toLowerCase(): return "bg-blue-100 text-blue-700 border-blue-200";
+        case RequestStatus.WORKING.toLowerCase(): return "bg-teal-100 text-teal-700 border-teal-200";
+        case RequestStatus.WORK_COMPLETED.toLowerCase(): return "bg-sky-100 text-sky-700 border-sky-200";
+        case RequestStatus.PAYMENT_PENDING.toLowerCase(): return "bg-orange-100 text-orange-700 border-orange-200";
+        case RequestStatus.PAYMENT_DONE.toLowerCase(): return "bg-green-100 text-green-700 border-green-200";
+        case RequestStatus.REJECTED.toLowerCase(): return "bg-red-100 text-red-700 border-red-200";
+        case RequestStatus.OVERDUE.toLowerCase(): return "bg-rose-100 text-rose-700 border-rose-200";
         default: return "bg-gray-100 text-gray-700 border-gray-200";
     }
 }
@@ -84,13 +87,13 @@ function FileMessageContent({ file, isCurrentUser }: { file: NonNullable<Message
         switch (file.type) {
             case 'image':
                 return (
-                    <a href={file.url} target="_blank" rel="noopener noreferrer" className="block relative aspect-square w-full max-w-xs overflow-hidden rounded-lg">
-                        <Image src={file.url} alt={file.name} layout="fill" className="object-cover" />
+                    <a href={file.url} target="_blank" rel="noopener noreferrer" className="block relative w-full h-auto md:w-[200px] md:h-[200px] aspect-square overflow-hidden rounded-lg">
+                        <Image src={file.url} alt={file.name} fill className="object-cover" />
                     </a>
                 );
             case 'video':
                 return (
-                     <div className="relative flex aspect-video w-full max-w-sm items-center justify-center overflow-hidden rounded-lg bg-black">
+                     <div className="relative flex w-full h-auto md:w-[200px] md:h-[200px] items-center justify-center overflow-hidden rounded-lg bg-black">
                         <video src={file.url} className="h-full w-full object-cover" controls />
                     </div>
                 );
@@ -121,7 +124,7 @@ function FileMessageContent({ file, isCurrentUser }: { file: NonNullable<Message
                 const getFileIcon = () => {
                     if (file.name.endsWith('.pdf')) return <FileText className="h-6 w-6 text-red-600" />;
                     if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) return <FileText className="h-6 w-6 text-blue-600" />;
-                    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) return <FileText className="h-6 w-6 text-green-600" />;
+                    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) return <Sheet className="h-6 w-6 text-green-600" />;
                     return <FileIcon className="h-6 w-6 text-muted-foreground" />;
                 }
                 return (
@@ -155,16 +158,6 @@ function FileMessageContent({ file, isCurrentUser }: { file: NonNullable<Message
 }
 
 function RequestDetailsMessage({ request }: { request: Request }) {
-    const getVehicleIcon = (vehicleType: string) => {
-        switch(vehicleType) {
-            case 'Car': return <Car className="h-5 w-5 text-primary" />;
-            case 'Truck': return <Truck className="h-5 w-5 text-primary" />;
-            case 'Bike': return <Bike className="h-5 w-5 text-primary" />;
-            case 'Bus': return <Bus className="h-5 w-5 text-primary" />;
-            default: return <Car className="h-5 w-5 text-primary" />;
-        }
-    }
-
     const getFileIcon = (fileName: string) => {
         if (fileName.endsWith('.pdf')) return <FileText className="h-5 w-5 text-red-500 flex-shrink-0" />;
         if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) return <FileText className="h-5 w-5 text-blue-500 flex-shrink-0" />;
@@ -179,7 +172,7 @@ function RequestDetailsMessage({ request }: { request: Request }) {
                     <div className="flex items-start justify-between">
                         <div className="space-y-1">
                             <h2 className="text-xl font-semibold tracking-tight">{request.title}</h2>
-                            <p className="text-sm text-gray-500">{request.vehicleDetails}</p>
+                            <p className="text-sm text-gray-500">{`${request.requestType} | ${request.vehicleDetails}`}</p>
                         </div>
                          <Badge className={`px-3 py-1 text-xs rounded-full font-medium border ${getStatusClass(request.status)}`}>
                             {request.status.toUpperCase()}
@@ -188,17 +181,54 @@ function RequestDetailsMessage({ request }: { request: Request }) {
 
                     <Separator className="my-4" />
                     
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                        <div className="flex items-start gap-3">
+                            <UserIcon className="h-5 w-5 mt-0.5 text-gray-400"/>
+                            <div>
+                                <p className="text-gray-500">Created By</p>
+                                <p className="font-medium text-gray-800">{request.apiData?.created_by_name}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <Calendar className="h-5 w-5 mt-0.5 text-gray-400"/>
+                            <div>
+                                <p className="text-gray-500">Created On</p>
+                                <p className="font-medium text-gray-800">{format(new Date(request.createdAt), "dd MMM yyyy, p")}</p>
+                            </div>
+                        </div>
+                        {request.apiData?.approved_by && (
+                           <>
+                             <div className="flex items-start gap-3">
+                                <Check className="h-5 w-5 mt-0.5 text-green-500"/>
+                                <div>
+                                    <p className="text-gray-500">Approved By</p>
+                                    <p className="font-medium text-gray-800">{request.apiData?.approved_by_name}</p>
+                                </div>
+                            </div>
+                             <div className="flex items-start gap-3">
+                                <Calendar className="h-5 w-5 mt-0.5 text-gray-400"/>
+                                <div>
+                                    <p className="text-gray-500">Approved On</p>
+                                    <p className="font-medium text-gray-800">{request.apiData?.approval_at ? format(new Date(request.apiData?.approval_at), "dd MMM yyyy, p") : 'N/A'}</p>
+                                </div>
+                            </div>
+                           </>
+                        )}
+                    </div>
+                     
+                     <Separator className="my-4" />
+
                     <div className="space-y-4">
                         <div>
                              <h3 className="text-sm font-medium text-gray-600 mb-2">Description</h3>
-                             <p className="text-sm leading-relaxed text-gray-800">{request.messages.find(m => m.type === MessageType.TEXT)?.content || "No description provided."}</p>
+                             <p className="text-sm leading-relaxed text-gray-800">{request.apiData?.description || "No description provided."}</p>
                         </div>
                         {request.documents.length > 0 && (
                              <div>
                                 <h3 className="text-sm font-medium text-gray-600 mb-2">Documents</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {request.documents.map((doc, index) => (
-                                        <a href={doc.url} key={index} download className="group">
+                                        <a href={doc.url} key={index} target="_blank" rel="noopener noreferrer" className="group">
                                             <div className="flex items-center gap-3 rounded-lg border bg-gray-50/80 p-2.5 hover:bg-gray-100 hover:shadow-sm transition-all duration-200">
                                                 {getFileIcon(doc.name)}
                                                 <div className="flex-1 min-w-0">
@@ -218,9 +248,118 @@ function RequestDetailsMessage({ request }: { request: Request }) {
     )
 }
 
+function ProgressUpdateMessage({ update }: { update: ProgressUpdate }) {
+    const getIcon = () => {
+        switch (update.progress_type) {
+            case 'initial': return <CalendarCheck2 className="size-5 text-blue-600" />;
+            case 'delay': return <AlertTriangle className="size-5 text-amber-600" />;
+            case 'completed': return <Check className="size-5 text-green-600" />;
+            default: return <Info className="size-5 text-gray-600" />;
+        }
+    };
 
-export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps) {
-  const request = requests.find(r => r.id === message.requestId);
+    const getTitle = () => {
+        switch (update.progress_type) {
+            case 'initial': return 'Initial Time Limit Set';
+            case 'delay': return 'Work Delayed';
+            case 'completed': return 'Work Marked as Completed';
+            default: return 'Progress Update';
+        }
+    };
+
+    return (
+        <div className="w-full max-w-2xl mx-auto my-2">
+            <div className="flex items-start gap-3 rounded-lg border bg-blue-50/70 p-3 shadow-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 flex-shrink-0">
+                    {getIcon()}
+                </div>
+                <div className="flex-1 text-sm">
+                    <p className="font-semibold text-blue-900">{getTitle()}</p>
+                    <p className="text-blue-800/90">
+                        New expected completion date is <strong className="font-medium">{format(new Date(update.expected_end_date), 'PPP')}</strong>.
+                        {update.progress_type === 'delay' && update.delay_reason && ` Reason: "${update.delay_reason}"`}
+                    </p>
+                    <p className="text-xs text-blue-600/80 mt-1">
+                        Updated by {update.updated_by_name} on {format(new Date(update.created_at), 'dd MMM yyyy, p')}
+                    </p>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function GatePassDetailsMessage({ pass }: { pass: GatePass }) {
+    return (
+        <div className="w-full max-w-2xl mx-auto my-2">
+            <div className="rounded-lg border bg-teal-50/70 p-3 shadow-sm">
+                <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-100 flex-shrink-0">
+                        <QrCode className="size-5 text-teal-600" />
+                    </div>
+                    <div className="flex-1 text-sm">
+                        <p className="font-semibold text-teal-900">Gate Pass Created (ID: {pass.id})</p>
+                        <div className="mt-2 space-y-1 text-teal-800/90">
+                            <p><strong>Purpose:</strong> {pass.purpose}</p>
+                            <p><strong>Vehicle:</strong> {pass.vehicle_number}</p>
+                            <p><strong>Issued To:</strong> {pass.issued_to_name}</p>
+                            <p><strong>Valid From:</strong> {format(new Date(pass.valid_from), 'PPp')}</p>
+                            <p><strong>Valid To:</strong> {format(new Date(pass.valid_to), 'PPp')}</p>
+                            <div><strong>Status:</strong> <Badge variant="secondary" className="capitalize">{pass.status}</Badge></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function GatePassOutMessage({ pass }: { pass: GatePass }) {
+    return (
+        <div className="w-full max-w-2xl mx-auto my-2">
+            <div className="flex items-center gap-3 rounded-lg border bg-orange-50/70 p-3 shadow-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 flex-shrink-0">
+                    <LogOut className="size-5 text-orange-600" />
+                </div>
+                <div className="flex-1 text-sm">
+                    <p className="font-semibold text-orange-900">Vehicle Marked as OUT</p>
+                    <p className="text-orange-800/90">Vehicle <strong className="font-medium">{pass.vehicle_number}</strong> exited at {pass.out_time ? format(new Date(pass.out_time), 'PPp') : ''}.</p>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function GatePassInMessage({ pass }: { pass: GatePass }) {
+    return (
+        <div className="w-full max-w-2xl mx-auto my-2">
+            <div className="flex items-center gap-3 rounded-lg border bg-green-50/70 p-3 shadow-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 flex-shrink-0">
+                    <LogIn className="size-5 text-green-600" />
+                </div>
+                <div className="flex-1 text-sm">
+                     <p className="font-semibold text-green-900">Vehicle Marked as IN</p>
+                    <p className="text-green-800/90">Vehicle <strong className="font-medium">{pass.vehicle_number}</strong> entered at {pass.in_time ? format(new Date(pass.in_time), 'PPp') : ''}.</p>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+
+export function ChatMessage({ message, sender, isCurrentUser, request, onApprovalAction }: ChatMessageProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleApprove = async () => {
+    setIsLoading(true);
+    await onApprovalAction('approved');
+    // setIsLoading is not set to false here because the component will be unmounted on success
+  };
+
+  const handleReject = async () => {
+    setIsLoading(true);
+    await onApprovalAction('rejected');
+     // setIsLoading is not set to false here because the component will be unmounted on success
+  };
 
   const renderMessageContent = () => {
     switch (message.type) {
@@ -233,8 +372,8 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">{message.content}</p>
               <div className="flex gap-2">
-                <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white"><ThumbsUp className="mr-2 h-4 w-4" /> Approve</Button>
-                <Button size="sm" variant="destructive"><ThumbsDown className="mr-2 h-4 w-4" /> Reject</Button>
+                <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white" onClick={handleApprove} disabled={isLoading}><ThumbsUp className="mr-2 h-4 w-4" /> Approve</Button>
+                <Button size="sm" variant="destructive" onClick={handleReject} disabled={isLoading}><ThumbsDown className="mr-2 h-4 w-4" /> Reject</Button>
               </div>
             </CardContent>
           </Card>
@@ -270,7 +409,7 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">{message.content}</p>
                   <Button size="sm" asChild>
-                    <Link href={`/out-pass/${message.requestId}`} target="_blank">
+                    <Link href={`/out-pass/${message.requestId.replace('TR-','')}`} target="_blank">
                         <QrCode className="mr-2 h-4 w-4" /> Generate Out-Pass
                     </Link>
                   </Button>
@@ -296,6 +435,14 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
              return <FileMessageContent file={message.file} isCurrentUser={isCurrentUser} />;
         case MessageType.REQUEST_DETAILS:
              return request ? <RequestDetailsMessage request={request} /> : null;
+        case MessageType.PROGRESS_UPDATE:
+            return message.progress ? <ProgressUpdateMessage update={message.progress} /> : null;
+        case MessageType.GATE_PASS_DETAILS:
+            return message.gatePass ? <GatePassDetailsMessage pass={message.gatePass} /> : null;
+        case MessageType.GATE_PASS_IN:
+            return message.gatePass ? <GatePassInMessage pass={message.gatePass} /> : null;
+        case MessageType.GATE_PASS_OUT:
+            return message.gatePass ? <GatePassOutMessage pass={message.gatePass} /> : null;
       case MessageType.TEXT:
         return (
             <div
@@ -314,7 +461,10 @@ export function ChatMessage({ message, sender, isCurrentUser }: ChatMessageProps
     }
   };
   
-  if ([MessageType.SYSTEM, MessageType.APPROVAL, MessageType.DATE_PROMPT, MessageType.OUTPASS_GENERATION, MessageType.PAYMENT_TRACKING, MessageType.REQUEST_DETAILS].includes(message.type)) {
+  if ([MessageType.SYSTEM, MessageType.APPROVAL, MessageType.DATE_PROMPT, MessageType.OUTPASS_GENERATION, MessageType.PAYMENT_TRACKING, MessageType.REQUEST_DETAILS, MessageType.PROGRESS_UPDATE, MessageType.GATE_PASS_DETAILS, MessageType.GATE_PASS_UPDATE, MessageType.GATE_PASS_IN, MessageType.GATE_PASS_OUT].includes(message.type)) {
+     if (message.type === MessageType.APPROVAL && isCurrentUser) {
+      return null; // Don't show approval block to the current user if they are the creator
+    }
     return <div className="my-2">{renderMessageContent()}</div>;
   }
 

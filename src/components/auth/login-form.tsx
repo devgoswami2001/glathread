@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import {
@@ -16,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { subscribeToPushNotifications } from "@/lib/push";
 
 export function LoginForm() {
   const router = useRouter();
@@ -44,9 +46,14 @@ export function LoginForm() {
           title: "Login Successful",
           description: `Welcome, ${data.user.full_name}!`,
         });
-        // Here you would typically save the tokens, e.g., in localStorage or a cookie
-        // localStorage.setItem('accessToken', data.access);
-        // localStorage.setItem('refreshToken', data.refresh);
+        localStorage.setItem('accessToken', data.access);
+        localStorage.setItem('refreshToken', data.refresh);
+
+        // Request for push notification permission after login
+        if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+          await subscribeToPushNotifications();
+        }
+        
         router.push('/dashboard');
       } else {
         throw new Error(data.detail || "Failed to log in.");

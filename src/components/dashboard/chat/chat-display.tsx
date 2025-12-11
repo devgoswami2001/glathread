@@ -10,9 +10,14 @@ interface ChatDisplayProps {
   currentUser: User;
   onBack?: () => void;
   addMessage: (message: Message) => void;
+  onApprovalAction: (status: 'approved' | 'rejected') => void;
+  onProgressUpdate: (progress: any) => void;
+  onGatePassUpdate: (passId: number) => void;
+  onMarkCompleted: () => void;
+  currentUserId: number | null;
 }
 
-export function ChatDisplay({ request, users, currentUser, onBack, addMessage }: ChatDisplayProps) {
+export function ChatDisplay({ request, users, currentUser, onBack, addMessage, onApprovalAction, onProgressUpdate, onGatePassUpdate, onMarkCompleted, currentUserId }: ChatDisplayProps) {
   if (!request) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
@@ -29,9 +34,21 @@ export function ChatDisplay({ request, users, currentUser, onBack, addMessage }:
     <div className="flex h-full flex-col">
       <ChatTopbar request={request} onBack={onBack} />
       <div className="flex-1 overflow-y-auto">
-        <ChatMessageList request={request} users={users} currentUser={currentUser} />
+        <ChatMessageList 
+          request={request} 
+          users={users} 
+          currentUser={currentUser}
+          onApprovalAction={onApprovalAction}
+        />
       </div>
-      <ChatMessageInput request={request} addMessage={addMessage} />
+      <ChatMessageInput 
+        request={request} 
+        addMessage={addMessage}
+        onProgressUpdate={onProgressUpdate} 
+        onGatePassUpdate={onGatePassUpdate}
+        onMarkCompleted={onMarkCompleted}
+        currentUserId={currentUserId}
+      />
     </div>
   );
 }

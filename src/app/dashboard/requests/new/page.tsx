@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -7,88 +8,164 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageType, Request, RequestStatus, RequestType, VehicleType } from "@/lib/types";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { requests, users } from "@/lib/data";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
-type Document = { name: string; url: string };
+type DocumentFile = {
+    name: string;
+    file: File | null;
+};
+
+type Category = {
+    id: number;
+    name: string;
+};
+
+const vehicleTypes = ["bus", "car", "golf_cart", "e_rickshaw", "ambulance", "other"];
 
 export default function NewRequestPage() {
     const router = useRouter();
-    const [vehicleType, setVehicleType] = useState<VehicleType | ''>('');
-    const [requestType, setRequestType] = useState<RequestType | ''>('');
-    const [vehicleNumber, setVehicleNumber] = useState('');
+    const { toast } = useToast();
+    
+    const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [documents, setDocuments] = useState<Document[]>([]);
+    const [requestCategory, setRequestCategory] = useState('');
+    const [vehicleNumber, setVehicleNumber] = useState('');
+    const [vehicleType, setVehicleType] = useState('');
+    const [documents, setDocuments] = useState<DocumentFile[]>(Array(4).fill({ name: '', file: null }));
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
 
-    const handleDocChange = (index: number, field: 'name' | 'file', value: string) => {
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                 toast({
+                    variant: "destructive",
+                    title: "Authentication Error",
+                    description: "You are not logged in.",
+                });
+                router.push('/');
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/request-categories", {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch categories');
+                }
+                const data: Category[] = await response.json();
+                setCategories(data);
+            } catch (error: any) {
+                 toast({
+                    variant: "destructive",
+                    title: "Failed to load categories",
+                    description: error.message || "Could not fetch request categories from the server.",
+                });
+            } finally {
+                setIsCategoriesLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, [toast, router]);
+
+
+    const handleDocNameChange = (index: number, name: string) => {
         const newDocs = [...documents];
-        if (!newDocs[index]) {
-            newDocs[index] = { name: '', url: '#' };
-        }
-        if (field === 'name') {
-            newDocs[index].name = value;
-        }
+        newDocs[index] = { ...newDocs[index], name };
         setDocuments(newDocs);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleDocFileChange = (index: number, file: File | null) => {
+        const newDocs = [...documents];
+        newDocs[index] = { ...newDocs[index], file };
+        setDocuments(newDocs);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!vehicleType || !requestType || !vehicleNumber) {
-            // Basic validation
-            alert("Please fill out all required fields.");
+        
+        if (!requestCategory || !title || !description) {
+            toast({
+                variant: "destructive",
+                title: "Missing Required Fields",
+                description: "Please fill out Title, Description, and Request Category.",
+            });
+            return;
+        }
+        
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            toast({
+                variant: "destructive",
+                title: "Authentication Error",
+                description: "You are not logged in. Please log in again.",
+            });
+            router.push('/');
             return;
         }
 
-        const newRequestIdNumber = requests.length + 1;
-        const newRequestId = `TR-${String(newRequestIdNumber).padStart(3, '0')}`;
-        const newTitle = `${requestType} for ${vehicleNumber}`;
+        setIsLoading(true);
+        const formData = new FormData();
 
-        const newRequest: Request = {
-            id: newRequestId,
-            title: newTitle,
-            vehicleType,
-            vehicleNumber,
-            vehicleDetails: `${vehicleType} - ${vehicleNumber}`,
-            requestType,
-            status: RequestStatus.PENDING,
-            createdBy: 'user-current',
-            cfo: 'user-cfo',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            documents: documents.filter(doc => doc.name), // Only add docs with names
-            messages: [
-                {
-                    id: `msg-${newRequestId}-1`,
-                    requestId: newRequestId,
-                    senderId: 'system',
-                    type: MessageType.REQUEST_DETAILS,
-                    content: 'Request created by You.',
-                    timestamp: new Date().toISOString(),
-                    seen: true,
-                },
-                 { 
-                    id: `msg-${newRequestId}-2`, 
-                    requestId: newRequestId, 
-                    senderId: 'user-current', 
-                    content: description || "New request created.", 
-                    timestamp: new Date(Date.now() + 1000).toISOString(), 
-                    type: MessageType.TEXT, 
-                    seen: false 
-                }
-            ],
-        };
+        formData.append('request_category', requestCategory);
+        formData.append('title', title);
+        formData.append('description', description);
+
+        if (vehicleNumber) formData.append('vehicle_number', vehicleNumber);
+        if (vehicleType) formData.append('vehicle_type', vehicleType);
+
+        documents.forEach((doc, index) => {
+            if (doc.file && doc.name) {
+                formData.append(`document_${index + 1}_name`, doc.name);
+                formData.append(`document_${index + 1}_file`, doc.file);
+            }
+        });
+
         
-        requests.unshift(newRequest); // Add to the beginning of the list
+        
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/threads/create/", {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData,
+            });
 
-        router.push(`/dashboard/requests/${newRequestId.replace('TR-', '')}`);
+            const result = await response.json();
+
+            if (response.ok) {
+                toast({
+                    title: "Thread Created Successfully!",
+                    description: `Thread "${result.thread_number}" has been created.`,
+                });
+                router.push(`/dashboard/requests/${result.thread_number}`);
+            } else {
+                const errorMessages = Object.values(result).flat().join('\n');
+                throw new Error(errorMessages || "An unknown error occurred.");
+            }
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: "Failed to create thread",
+                description: error.message || "There was a problem with your request.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
-
-    const documentFields = Array.from({ length: 4 });
-
+    
     return (
         <div className="flex-1 overflow-auto p-4 md:p-8">
             <div className="max-w-3xl mx-auto">
@@ -96,90 +173,109 @@ export default function NewRequestPage() {
                     <Button variant="outline" size="icon" className="h-8 w-8" asChild>
                         <Link href="/dashboard"><ChevronLeft className="h-4 w-4" /></Link>
                     </Button>
-                    <h1 className="text-2xl font-headline font-semibold">Create New Request</h1>
+                    <h1 className="text-2xl font-headline font-semibold">Create New Thread</h1>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <Card>
                         <CardHeader>
-                            <CardTitle>Request Details</CardTitle>
-                            <CardDescription>Fill out the form below to submit a new transport request.</CardDescription>
+                            <CardTitle>Thread Details</CardTitle>
+                            <CardDescription>Fill out the form below to submit a new transport request thread.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="request-category">Request Category (Required)</Label>
+                                <Select onValueChange={setRequestCategory} value={requestCategory} disabled={isCategoriesLoading}>
+                                    <SelectTrigger id="request-category">
+                                        <SelectValue placeholder={isCategoriesLoading ? "Loading categories..." : "Select a request category"} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map((cat) => (
+                                            <SelectItem key={cat.id} value={String(cat.id)}>{cat.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <Label htmlFor="title">Title (Required)</Label>
+                                <Input
+                                    id="title"
+                                    placeholder="e.g., Urgent Repair for Clutch Plate"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="description">Description (Required)</Label>
+                                <Textarea
+                                    id="description"
+                                    placeholder="Add a detailed description..."
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    required
+                                />
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="vehicle-type">Vehicle Type</Label>
-                                    <Select onValueChange={(value) => setVehicleType(value as VehicleType)} value={vehicleType}>
+                                    <Label htmlFor="vehicle-number">Vehicle Number (Optional)</Label>
+                                    <Input
+                                        id="vehicle-number"
+                                        placeholder="e.g., MH12-AB1234"
+                                        value={vehicleNumber}
+                                        onChange={(e) => setVehicleNumber(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="vehicle-type">Vehicle Type (Optional)</Label>
+                                    <Select onValueChange={setVehicleType} value={vehicleType}>
                                         <SelectTrigger id="vehicle-type">
                                             <SelectValue placeholder="Select vehicle type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {Object.values(VehicleType).map((type) => (
-                                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                                            {vehicleTypes.map((type) => (
+                                                <SelectItem key={type} value={type} className="capitalize">{type.replace(/_/g, ' ')}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="request-type">Request Type</Label>
-                                    <Select onValueChange={(value) => setRequestType(value as RequestType)} value={requestType}>
-                                        <SelectTrigger id="request-type">
-                                            <SelectValue placeholder="Select a request type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {Object.values(RequestType).map((type) => (
-                                                <SelectItem key={type} value={type}>{type}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="vehicle-number">Vehicle Number</Label>
-                                <Input
-                                    id="vehicle-number"
-                                    placeholder="e.g., MH12-AB1234"
-                                    value={vehicleNumber}
-                                    onChange={(e) => setVehicleNumber(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="description">Description / Initial Message</Label>
-                                <Textarea
-                                    id="description"
-                                    placeholder="Add a detailed description or an initial message for the request thread..."
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                />
                             </div>
 
                             <div className="space-y-4">
-                                <Label>Documents</Label>
-                                {documentFields.map((_, index) => (
+                                <Label>Documents (Optional - Max 4)</Label>
+                                {documents.map((_, index) => (
                                     <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg">
                                         <div className="space-y-2">
                                             <Label htmlFor={`doc-${index}-name`} className="text-sm font-normal">Document {index + 1} Name</Label>
                                             <Input
                                                 id={`doc-${index}-name`}
                                                 placeholder="e.g., Invoice, Permit..."
-                                                onChange={(e) => handleDocChange(index, 'name', e.target.value)}
+                                                onChange={(e) => handleDocNameChange(index, e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor={`doc-${index}-file`} className="text-sm font-normal">Document {index + 1} File</Label>
-                                            <Input id={`doc-${index}-file`} type="file" />
+                                            <Input 
+                                                id={`doc-${index}-file`} 
+                                                type="file" 
+                                                onChange={(e) => handleDocFileChange(index, e.target.files?.[0] || null)}
+                                            />
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            <Button type="submit" size="lg">Submit Request</Button>
+                            <Button type="submit" size="lg" disabled={isLoading}>
+                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Submit Request
+                            </Button>
                         </CardContent>
                     </Card>
                 </form>
             </div>
         </div>
-    )
+    );
 }
