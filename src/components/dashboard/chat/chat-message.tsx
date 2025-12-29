@@ -7,7 +7,7 @@ import { MessageType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon, Paperclip, Truck, Car, Bike, Bus, StopCircle, FileType2, Sheet, User as UserIcon, Calendar, AlertTriangle, Clock, CalendarCheck2, Info, LogIn, LogOut } from "lucide-react";
+import { Check, ThumbsDown, ThumbsUp, FileText, Download, QrCode, Image as ImageIcon, Play, File as FileIcon, Paperclip, Truck, Car, Bike, Bus, StopCircle, FileType2, Sheet, User as UserIcon, Calendar, AlertTriangle, Clock, CalendarCheck2, Info, LogIn, LogOut, XCircle } from "lucide-react";
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,7 @@ interface ChatMessageProps {
   isCurrentUser: boolean;
   request: Request;
   onApprovalAction: (status: 'approved' | 'rejected') => void;
+  currentUser: User;
 }
 
 function getStatusClass(status: RequestStatus | string) {
@@ -164,6 +165,8 @@ function RequestDetailsMessage({ request }: { request: Request }) {
         if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) return <Sheet className="h-5 w-5 text-green-500 flex-shrink-0" />;
         return <FileType2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />;
     }
+    
+    const isRejected = request.apiData?.approval_status === 'rejected';
 
     return (
         <div className="w-full max-w-2xl mx-auto my-4">
@@ -199,16 +202,19 @@ function RequestDetailsMessage({ request }: { request: Request }) {
                         {request.apiData?.approved_by && (
                            <>
                              <div className="flex items-start gap-3">
-                                <Check className="h-5 w-5 mt-0.5 text-green-500"/>
+                                {isRejected 
+                                    ? <XCircle className="h-5 w-5 mt-0.5 text-red-500"/>
+                                    : <Check className="h-5 w-5 mt-0.5 text-green-500"/>
+                                }
                                 <div>
-                                    <p className="text-gray-500">Approved By</p>
+                                    <p className="text-gray-500">{isRejected ? 'Rejected By' : 'Approved By'}</p>
                                     <p className="font-medium text-gray-800">{request.apiData?.approved_by_name}</p>
                                 </div>
                             </div>
                              <div className="flex items-start gap-3">
                                 <Calendar className="h-5 w-5 mt-0.5 text-gray-400"/>
                                 <div>
-                                    <p className="text-gray-500">Approved On</p>
+                                    <p className="text-gray-500">{isRejected ? 'Rejected On' : 'Approved On'}</p>
                                     <p className="font-medium text-gray-800">{request.apiData?.approval_at ? format(new Date(request.apiData?.approval_at), "dd MMM yyyy, p") : 'N/A'}</p>
                                 </div>
                             </div>
@@ -346,8 +352,10 @@ function GatePassInMessage({ pass }: { pass: GatePass }) {
 }
 
 
-export function ChatMessage({ message, sender, isCurrentUser, request, onApprovalAction }: ChatMessageProps) {
+export function ChatMessage({ message, sender, isCurrentUser, request, onApprovalAction, currentUser }: ChatMessageProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const approverRoles = ['HOD', 'CFO', 'Registrar', 'Administrator'];
+  const canApprove = currentUser && approverRoles.includes(currentUser.role as string);
 
   const handleApprove = async () => {
     setIsLoading(true);
@@ -365,7 +373,7 @@ export function ChatMessage({ message, sender, isCurrentUser, request, onApprova
     switch (message.type) {
       case MessageType.APPROVAL:
         return (
-          <Card className="bg-secondary/50">
+          canApprove && <Card className="bg-secondary/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-semibold">Approval Required</CardTitle>
             </CardHeader>
@@ -462,8 +470,8 @@ export function ChatMessage({ message, sender, isCurrentUser, request, onApprova
   };
   
   if ([MessageType.SYSTEM, MessageType.APPROVAL, MessageType.DATE_PROMPT, MessageType.OUTPASS_GENERATION, MessageType.PAYMENT_TRACKING, MessageType.REQUEST_DETAILS, MessageType.PROGRESS_UPDATE, MessageType.GATE_PASS_DETAILS, MessageType.GATE_PASS_UPDATE, MessageType.GATE_PASS_IN, MessageType.GATE_PASS_OUT].includes(message.type)) {
-     if (message.type === MessageType.APPROVAL && isCurrentUser) {
-      return null; // Don't show approval block to the current user if they are the creator
+    if (message.type === MessageType.APPROVAL && !canApprove) {
+      return null;
     }
     return <div className="my-2">{renderMessageContent()}</div>;
   }

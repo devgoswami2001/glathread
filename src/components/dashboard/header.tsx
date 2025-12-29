@@ -25,10 +25,6 @@ export function DashboardHeader() {
         </Link>
        </div>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-sm">
-            <Bell className="h-5 w-5"/>
-            <span className="sr-only">Notifications</span>
-        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">

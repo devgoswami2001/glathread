@@ -1,9 +1,12 @@
+
 'use client';
 
 import type { Request, User } from "@/lib/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatMessage } from "./chat-message";
 import { useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Bell } from "lucide-react";
 
 interface ChatMessageListProps {
   request: Request;
@@ -13,7 +16,6 @@ interface ChatMessageListProps {
 }
 
 export function ChatMessageList({ request, users, currentUser, onApprovalAction }: ChatMessageListProps) {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,8 +28,9 @@ export function ChatMessageList({ request, users, currentUser, onApprovalAction 
   }, [request.messages]);
   
   return (
-    <ScrollArea className="flex-1" ref={scrollAreaRef} viewportRef={viewportRef}>
-      <div className="p-4 md:p-6">
+    <ScrollArea className="h-full" viewportRef={viewportRef}>
+      <div className="relative p-4 md:p-6">
+        
         <div className="flex flex-col gap-4 max-w-2xl mx-auto">
           {request.messages.map((message) => {
              const sender = message.senderId === 'system' 
@@ -42,6 +45,7 @@ export function ChatMessageList({ request, users, currentUser, onApprovalAction 
                 isCurrentUser={message.senderId === currentUser.id}
                 request={request}
                 onApprovalAction={onApprovalAction}
+                currentUser={currentUser}
               />
             );
           })}

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Input } from "@/components/ui/input";
@@ -468,7 +469,7 @@ export function ChatMessageInput({ request, addMessage, onProgressUpdate, curren
         };
     }, [filePreview]);
     
-    const canSetTimeLimit = request?.apiData?.approval_status === 'approved' && !hasInitialProgress && request.apiData.created_by === currentUserId;
+    const canSetTimeLimit = request?.apiData?.approval_status === 'approved' && !hasInitialProgress;
     const canMarkCompleted = request.status.toLowerCase() === RequestStatus.APPROVED.toLowerCase() || request.status.toLowerCase() === RequestStatus.WORKING.toLowerCase();
 
     return (

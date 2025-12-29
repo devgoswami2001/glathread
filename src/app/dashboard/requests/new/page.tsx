@@ -150,7 +150,7 @@ export default function NewRequestPage() {
                     title: "Thread Created Successfully!",
                     description: `Thread "${result.thread_number}" has been created.`,
                 });
-                router.push(`/dashboard/requests/${result.thread_number}`);
+                router.push(`/dashboard/requests/${result.thread_id}`);
             } else {
                 const errorMessages = Object.values(result).flat().join('\n');
                 throw new Error(errorMessages || "An unknown error occurred.");

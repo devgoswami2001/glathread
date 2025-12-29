@@ -4,7 +4,7 @@ export type User = {
   id: string;
   name: string;
   avatar: string;
-  role: 'Supervisor' | 'CFO' | 'GateTeam';
+  role: 'Supervisor' | 'CFO' | 'GateTeam' | 'HOD' | 'Registrar' | 'Administrator' | string;
 };
 
 export enum MessageType {
@@ -120,3 +120,5 @@ export type Request = {
   outpass_qr?: string;
   apiData?: any; // To store the raw API thread object
 };
+
+    
